@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PlateTrack | Traffic Enforcer Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/modal.css">
+
+</head>
+
+<body>
+
+    <div class="background-grid"></div>
+
+    <div class="login-wrapper">
+
+        <div class="login-card">
+
+            <div class="logo-area">
+
+                <div class="logo-box">
+                    🛡️
+                </div>
+
+                <h1>PlateTrack</h1>
+
+                <span class="badge">
+                    ANTIPOLO CITY LGU
+                </span>
+
+                <p class="portal">
+                    Traffic Enforcer Portal
+                </p>
+
+            </div>
+
+            <div class="welcome">
+
+                <h2>Welcome Back</h2>
+
+                <p>
+                    Sign in to continue to PlateTrack
+                </p>
+
+            </div>
+
+            <form id="loginForm" autocomplete="off">
+
+                <div class="input-group">
+
+                    <label for="email">Email Address</label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        maxlength="100"
+                        autocomplete="off"
+                        placeholder="officer@platetrack.gov.ph"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="password">Password</label>
+
+                    <div class="password-box">
+
+                        <input
+                            id="password"
+                            type="password"
+                            maxlength="50"
+                            autocomplete="off"
+                            placeholder="Enter Password"
+                            required>
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            aria-label="Show Password">
+
+                            👁
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="remember">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            id="remember">
+
+                        <span>
+                            Remember this device
+                        </span>
+
+                    </label>
+
+                </div>
+
+                <div class="account-links">
+
+                    <a href="forgot-password.html">
+                        Forgot Password?
+                    </a>
+
+                    <a href="enforcer-register.html">
+                        Create Account
+                    </a>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="login-btn"
+                    onclick="loginOfficer()">
+
+                    Sign in to System
+
+                </button>
+
+            </form>
+
+            <div class="back-link">
+
+                <a href="index.html">
+                    ← Back to Portal Selection
+                </a>
+
+            </div>
+
+            <div class="footer">
+
+                <span>
+                    🔒 Secure Login
+                </span>
+
+                <small>
+                    Developed for Antipolo City LGU
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- GLOBAL MODAL -->
+
+    <div id="globalModal" class="modal">
+
+        <div class="modal-box">
+
+            <div
+                id="modalIcon"
+                class="modal-icon">
+
+                ✅
+
+            </div>
+
+            <div
+                id="modalTitle"
+                class="modal-title">
+
+                Success
+
+            </div>
+
+            <div
+                id="modalMessage"
+                class="modal-message">
+
+                Message
+
+            </div>
+
+            <div
+                id="modalButtons"
+                class="modal-buttons">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/modal.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>

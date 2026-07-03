@@ -1,0 +1,666 @@
+/* ==========================================
+   PlateTrack Register Page
+========================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Inter',sans-serif;
+    background:#07111f;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow-y:auto;
+    padding:40px 20px;
+
+}
+
+/* Animated Background */
+
+.background-grid{
+
+    position:fixed;
+    inset:0;
+
+    background:
+    radial-gradient(circle at 20% 20%,rgba(61,108,255,.25),transparent 35%),
+    radial-gradient(circle at 80% 70%,rgba(61,108,255,.18),transparent 35%),
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px),
+    #07111f;
+
+    background-size:
+    100% 100%,
+    100% 100%,
+    45px 45px,
+    45px 45px;
+
+    animation:moveGrid 18s linear infinite;
+
+}
+
+@keyframes moveGrid{
+
+    from{
+
+        background-position:0 0,0 0,0 0,0 0;
+
+    }
+
+    to{
+
+        background-position:0 0,0 0,45px 45px,45px 45px;
+
+    }
+
+}
+
+.login-wrapper{
+
+    width:100%;
+    max-width:560px;
+    position:relative;
+    z-index:5;
+
+}
+
+.login-card{
+
+    background:rgba(17,30,53,.84);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:24px;
+
+    padding:40px;
+
+    box-shadow:
+    0 25px 60px rgba(0,0,0,.45),
+    0 0 40px rgba(61,108,255,.18);
+
+}
+
+.logo-area{
+
+    text-align:center;
+    margin-bottom:30px;
+
+}
+
+.logo-box{
+
+    width:80px;
+    height:80px;
+    margin:auto auto 20px;
+    border-radius:20px;
+
+    background:#3d6cff;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:40px;
+
+    box-shadow:0 0 30px rgba(61,108,255,.45);
+
+}
+
+.logo-area h1{
+
+    font-size:42px;
+    font-weight:800;
+
+}
+
+.badge{
+
+    display:inline-block;
+
+    margin-top:12px;
+
+    background:#2c5fff;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+}
+
+.portal{
+
+    margin-top:15px;
+
+    color:#9fb2d8;
+
+    font-size:15px;
+
+}
+
+.welcome{
+
+    text-align:center;
+    margin-bottom:30px;
+
+}
+
+.welcome h2{
+
+    font-size:30px;
+    margin-bottom:8px;
+
+}
+
+.welcome p{
+
+    color:#9fb2d8;
+
+}
+
+/* Progress */
+
+.progress-container{
+
+    margin-bottom:30px;
+
+}
+
+.progress-bar{
+
+    width:100%;
+    height:8px;
+
+    background:#223656;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+}
+
+.progress-fill{
+
+    width:50%;
+
+    height:100%;
+
+    background:#3d6cff;
+
+    transition:.35s;
+
+}
+
+#stepText{
+
+    text-align:center;
+
+    margin-top:10px;
+
+    color:#9fb2d8;
+
+    font-size:14px;
+
+}
+
+.step-title{
+
+    margin-bottom:20px;
+
+    font-size:22px;
+
+}
+
+/* Inputs */
+
+.input-group{
+
+    margin-bottom:18px;
+
+}
+
+.input-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    font-size:14px;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:14px;
+
+    background:#1b2f4d;
+
+    color:#fff;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+.input-group input:focus{
+
+    box-shadow:0 0 0 2px #3d6cff;
+
+}
+
+/* ==========================================
+   PASSWORD BOX
+========================================== */
+
+.password-box{
+
+    position:relative;
+
+}
+
+.password-box input{
+
+    padding-right:55px;
+
+}
+
+.password-box button{
+
+    position:absolute;
+
+    top:50%;
+
+    right:15px;
+
+    transform:translateY(-50%);
+
+    background:none;
+
+    border:none;
+
+    color:#b8c8ea;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+/* ==========================================
+   PASSWORD REQUIREMENTS
+========================================== */
+
+.password-rules{
+
+    margin:22px 0;
+
+    padding:18px;
+
+    background:#13233c;
+
+    border-radius:16px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+.password-rules h4{
+
+    margin-bottom:15px;
+
+    font-size:16px;
+
+}
+
+.rule{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:10px;
+
+    color:#9fb2d8;
+
+    font-size:14px;
+
+}
+
+.rule:last-child{
+
+    margin-bottom:0;
+
+}
+
+.rule.valid{
+
+    color:#4ade80;
+
+}
+
+.rule.valid i{
+
+    color:#22c55e;
+
+}
+
+/* ==========================================
+   PASSWORD STRENGTH
+========================================== */
+
+.password-strength{
+
+    margin:22px 0;
+
+}
+
+.strength-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+}
+
+.strength-bar{
+
+    width:100%;
+
+    height:8px;
+
+    background:#223656;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+}
+
+.strength-fill{
+
+    width:0;
+
+    height:100%;
+
+    background:#dc3545;
+
+    transition:.3s;
+
+}
+
+/* ==========================================
+   CHECKBOX
+========================================== */
+
+.remember{
+
+    margin:25px 0;
+
+}
+
+.remember label{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+    cursor:pointer;
+
+    color:#d9e6ff;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+}
+
+.remember input{
+
+    margin-top:3px;
+
+    accent-color:#3d6cff;
+
+}
+
+/* ==========================================
+   APPROVAL NOTICE
+========================================== */
+
+.approval-note{
+
+    display:flex;
+
+    gap:12px;
+
+    align-items:flex-start;
+
+    background:rgba(61,108,255,.12);
+
+    border:1px solid rgba(61,108,255,.30);
+
+    border-radius:14px;
+
+    padding:16px;
+
+    margin-bottom:25px;
+
+    color:#cfe0ff;
+
+    line-height:1.6;
+
+    font-size:14px;
+
+}
+
+.approval-note i{
+
+    color:#6ea8ff;
+
+    margin-top:3px;
+
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.button-group{
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.back-btn{
+
+    flex:1;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#334155;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.back-btn:hover{
+
+    background:#475569;
+
+}
+
+.register-btn{
+
+    flex:1;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:linear-gradient(135deg,#4e7eff,#2c5fff);
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    transition:.3s;
+
+}
+
+.register-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 25px rgba(61,108,255,.35);
+
+}
+
+/* STEP 1 NEXT BUTTON */
+
+#step1 .register-btn{
+
+    width:100%;
+
+}
+
+/* ==========================================
+   BACK LINK
+========================================== */
+
+.back-link{
+
+    text-align:center;
+
+    margin-top:25px;
+
+}
+
+.back-link a{
+
+    color:#82aaff;
+
+    text-decoration:none;
+
+    font-size:14px;
+
+}
+
+.back-link a:hover{
+
+    color:#fff;
+
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.footer{
+
+    margin-top:30px;
+
+    text-align:center;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    padding-top:20px;
+
+}
+
+.footer span{
+
+    display:block;
+
+    margin-bottom:8px;
+
+}
+
+.footer small{
+
+    color:#8ea2ca;
+
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media(max-width:600px){
+
+.login-card{
+
+    padding:28px;
+
+}
+
+.button-group{
+
+    flex-direction:column;
+
+}
+
+.logo-area h1{
+
+    font-size:36px;
+
+}
+
+.welcome h2{
+
+    font-size:25px;
+
+}
+
+}

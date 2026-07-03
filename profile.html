@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>PlateTrack | Officer Profile</title>
+
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="css/modal.css">
+
+<link rel="stylesheet"
+href="css/profile.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="profile-card">
+
+<!-- PROFILE HEADER -->
+
+<div class="profile-header">
+
+<div class="avatar">
+
+👮
+
+</div>
+
+<h1 id="officerName">
+
+Juan Dela Cruz
+
+</h1>
+
+<p class="role">
+
+Traffic Enforcer
+
+</p>
+
+<div class="badge">
+
+🆔
+<span id="badgeNumber">
+
+TP-2026-001
+
+</span>
+
+</div>
+
+</div>
+
+<!-- OFFICER INFORMATION -->
+
+<div class="info-card">
+
+<h2>
+
+Officer Information
+
+</h2>
+
+<div class="info-row">
+
+<div class="info-left">
+
+🏢 Station
+
+</div>
+
+<div
+class="info-right"
+id="station">
+
+Antipolo Traffic Office
+
+</div>
+
+</div>
+
+<div class="divider"></div>
+
+<div class="info-row">
+
+<div class="info-left">
+
+📞 Contact Number
+
+</div>
+
+<div
+class="info-right"
+id="contact">
+
+09123456789
+
+</div>
+
+</div>
+
+<div class="divider"></div>
+
+<div class="info-row">
+
+<div class="info-left">
+
+📧 Email Address
+
+</div>
+
+<div
+class="info-right"
+id="email">
+
+officer@platetrack.com
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ACTION BUTTONS -->
+
+<div class="buttons">
+
+<button
+class="edit-btn"
+onclick="openEditModal()">
+
+✏ Edit Profile
+
+</button>
+
+<button
+class="password-btn"
+onclick="openPasswordModal()">
+
+🔒 Change Password
+
+</button>
+
+<button
+class="back-btn"
+onclick="window.location.href='enforcer-dashboard.html'">
+
+← Back to Dashboard
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ==========================
+EDIT PROFILE MODAL
+=========================== -->
+
+<div
+id="editModal"
+class="modal">
+
+<div class="modal-content">
+
+<span
+class="close"
+onclick="closeEditModal()">
+
+&times;
+
+</span>
+
+<h2>
+
+✏ Edit Profile
+
+</h2>
+
+<div class="input-group">
+
+<label>
+
+Officer Name
+
+</label>
+
+<input
+type="text"
+id="editName"
+readonly>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Badge Number
+
+</label>
+
+<input
+type="text"
+id="editBadge"
+readonly>
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Station
+
+</label>
+
+<input
+type="text"
+id="editStation">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Contact Number
+
+</label>
+
+<input
+type="text"
+id="editContact">
+
+</div>
+
+<div class="input-group">
+
+<label>
+
+Email Address
+
+</label>
+
+<input
+type="email"
+id="editEmail">
+
+</div>
+
+<div class="modal-buttons">
+
+<button
+class="cancel-btn"
+onclick="closeEditModal()">
+
+Cancel
+
+</button>
+
+<button
+class="save-btn"
+onclick="saveProfile()">
+
+💾 Save Changes
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ======================================
+CHANGE PASSWORD MODAL
+====================================== -->
+
+<div
+id="passwordModal"
+class="modal">
+
+    <div class="modal-content">
+
+        <span
+        class="close"
+        onclick="closePasswordModal()">
+
+            &times;
+
+        </span>
+
+        <h2>
+
+            🔒 Change Password
+
+        </h2>
+
+        <div class="input-group">
+
+            <label>
+
+                Current Password
+
+            </label>
+
+            <div class="password-box">
+
+                <input
+                type="password"
+                id="currentPassword"
+                placeholder="Enter current password">
+
+                <span
+                class="toggle-password"
+                onclick="togglePassword('currentPassword', this)">
+
+                    👁
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="input-group">
+
+            <label>
+
+                New Password
+
+            </label>
+
+            <div class="password-box">
+
+                <input
+                type="password"
+                id="newPassword"
+                placeholder="Enter new password"
+                oninput="checkPasswordStrength()">
+
+                <span
+                class="toggle-password"
+                onclick="togglePassword('newPassword', this)">
+
+                    👁
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="strength">
+
+            <div class="strength-bar">
+
+                <div
+                id="strengthFill">
+
+                </div>
+
+            </div>
+
+            <small
+            id="strengthText">
+
+                Password Strength
+
+            </small>
+
+        </div>
+
+        <div class="input-group">
+
+            <label>
+
+                Confirm Password
+
+            </label>
+
+            <div class="password-box">
+
+                <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm password">
+
+                <span
+                class="toggle-password"
+                onclick="togglePassword('confirmPassword', this)">
+
+                    👁
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+        id="passwordMessage"
+        class="password-message">
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+            class="cancel-btn"
+            onclick="closePasswordModal()">
+
+                Cancel
+
+            </button>
+
+            <button
+            class="save-btn"
+            onclick="savePassword()">
+
+                🔒 Change Password
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================
+GLOBAL MODAL
+====================================== -->
+
+<div
+id="globalModal"
+class="modal">
+
+    <div class="modal-box">
+
+        <div
+        id="modalIcon"
+        class="modal-icon">
+
+            ✅
+
+        </div>
+
+        <h2
+        id="modalTitle"
+        class="modal-title">
+
+            Success
+
+        </h2>
+
+        <p
+        id="modalMessage"
+        class="modal-message">
+
+            Message
+
+        </p>
+
+        <div
+        id="modalButtons"
+        class="modal-buttons">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="js/modal.js"></script>
+
+<script src="js/profile.js"></script>
+
+</body>
+
+</html>

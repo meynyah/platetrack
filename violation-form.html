@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PlateTrack | Violation Form</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/violation.css">
+<link rel="stylesheet" href="css/modal.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="form-card">
+
+        <h1>Traffic Violation Form</h1>
+
+        <p>Record a detected traffic violation.</p>
+
+        <form id="violationForm">
+
+            <!-- Plate Number -->
+
+            <div class="input-group">
+
+                <label>Plate Number</label>
+
+                <input
+                    type="text"
+                    id="plateNumber"
+                    placeholder="Enter Plate Number"
+                    autocomplete="off">
+
+                <small class="hint">
+                    You may edit it if necessary.
+                </small>
+
+                <small class="error" id="plateError"></small>
+
+            </div>
+
+            <!-- Vehicle Type -->
+
+            <div class="input-group">
+
+                <label>Vehicle Type</label>
+
+                <input
+                    type="text"
+                    id="vehicleType"
+                    value="Private 4-Wheels"
+                    readonly>
+
+            </div>
+
+            <!-- Violation -->
+
+            <div class="input-group">
+
+                <label>Violation</label>
+
+                <select id="violation">
+
+                    <option value="" selected disabled>
+                        Select Violation
+                    </option>
+
+                    <option value="Driving Without a Valid License">
+                        Driving Without a Valid License
+                    </option>
+
+                    <option value="Reckless Driving">
+                        Reckless Driving
+                    </option>
+
+                    <option value="Overspeeding">
+                        Overspeeding
+                    </option>
+
+                    <option value="Illegal Parking">
+                        Illegal Parking
+                    </option>
+
+                    <option value="No Seatbelt">
+                        No Seatbelt
+                    </option>
+
+                    <option value="Obstruction">
+                        Obstruction
+                    </option>
+
+                    <option value="Beating the Red Light">
+                        Beating the Red Light
+                    </option>
+
+                </select>
+
+                <small class="error" id="violationError"></small>
+
+            </div>
+
+            <!-- Fine -->
+
+            <div class="input-group">
+
+                <label>Traffic Fine (Based on Violation)</label>
+
+                <input
+                    type="text"
+                    id="fine"
+                    value="₱0.00"
+                    readonly>
+
+            </div>
+
+            <!-- Location -->
+
+            <div class="input-group">
+
+                <label>Location</label>
+
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Enter location"
+                    autocomplete="off">
+
+                <small class="error" id="locationError"></small>
+
+            </div>
+
+            <!-- Officer -->
+
+            <div class="input-group">
+
+                <label>Officer Name</label>
+
+                <input
+                    type="text"
+                    id="officer"
+                    placeholder="Enter Officer Name"
+                    autocomplete="off">
+
+                <small class="error" id="officerError"></small>
+
+            </div>
+
+            <!-- Remarks -->
+
+            <div class="input-group">
+
+                <label>Remarks</label>
+
+                <textarea
+                    id="remarks"
+                    rows="4"
+                    maxlength="250"
+                    placeholder="Additional remarks..."
+                    autocomplete="off"></textarea>
+
+                <small
+                    id="remarksCounter"
+                    class="counter">
+
+                    0 / 250 characters
+
+                </small>
+
+            </div>
+
+            <button
+                type="button"
+                class="submit-btn"
+                onclick="submitViolation()">
+
+                Submit Violation
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- SUCCESS MODAL -->
+
+<div
+    class="modal"
+    id="successModal">
+
+    <div class="modal-content">
+
+        <div class="success-icon">
+
+            ✅
+
+        </div>
+
+        <h2>
+
+            Violation Recorded!
+
+        </h2>
+
+        <p>
+
+            The violation has been saved successfully.
+
+        </p>
+
+        <div class="summary">
+
+            <p>
+
+                <strong>Plate :</strong>
+
+                <span id="summaryPlate"></span>
+
+            </p>
+
+            <p>
+
+                <strong>Violation :</strong>
+
+                <span id="summaryViolation"></span>
+
+            </p>
+
+            <p>
+
+                <strong>Fine :</strong>
+
+                <span id="summaryFine"></span>
+
+            </p>
+
+            <p>
+
+                <strong>Status :</strong>
+
+                Pending
+
+            </p>
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+                class="history-btn"
+                onclick="goHistory()">
+
+                📄 View History
+
+            </button>
+
+            <button
+                class="dashboard-btn"
+                onclick="goDashboard()">
+
+                🏠 Dashboard
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- GLOBAL MODAL -->
+
+<div id="globalModal" class="modal">
+
+    <div class="modal-box">
+
+        <div
+        id="modalIcon"
+        class="modal-icon">
+
+            ✅
+
+        </div>
+
+        <div
+        id="modalTitle"
+        class="modal-title">
+
+            Success
+
+        </div>
+
+        <div
+        id="modalMessage"
+        class="modal-message">
+
+            Message
+
+        </div>
+
+        <div
+        id="modalButtons"
+        class="modal-buttons">
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/modal.js"></script>
+<script src="js/violation.js"></script>
+
+</body>
+</html>
