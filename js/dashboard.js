@@ -1,8 +1,4 @@
 // ==========================================
-// LOAD SAVED THEME
-// ==========================================
-
-// ==========================================
 // PLATETRACK DASHBOARD
 // ==========================================
 
@@ -19,13 +15,26 @@ document.addEventListener("DOMContentLoaded",function(){
 
 function getViolationRecords(){
 
-    const data = localStorage.getItem("plateTrackHistory");
+    try{
 
-    if(!data){
-        return [];
+        const data = localStorage.getItem("plateTrackHistory");
+
+        if(!data){
+            return [];
+        }
+
+        const parsed = JSON.parse(data);
+
+        return Array.isArray(parsed) ? parsed : [];
+
     }
+    catch(error){
 
-    return JSON.parse(data);
+        console.error("Unable to read violation history:",error);
+
+        return [];
+
+    }
 
 }
 
@@ -130,13 +139,9 @@ function confirmLogout(){
 function loadDashboardData(){
 
     const records = getViolationRecords();
-    const notificationsSetting =
-    localStorage.getItem("plateTrackNotifications");
-
-    const preferences = {
-        notifications:
-        notificationsSetting === null ? true : notificationsSetting === "true"
-    };
+    const preferences = window.PlateTrackPreferences ?
+    window.PlateTrackPreferences.get() :
+    {notifications:true};
 
     document.getElementById("vehicleCount").textContent = records.length;
     document.getElementById("violationCount").textContent = records.length;

@@ -10,14 +10,31 @@ document.addEventListener("DOMContentLoaded",function(){
 });
 
 // ==========================================
-// GET HISTORY
+// GET HISTORY (with safe parsing)
 // ==========================================
 
 function getHistoryRecords(){
 
-    return JSON.parse(
-        localStorage.getItem("plateTrackHistory")
-    ) || [];
+    try{
+
+        const data = localStorage.getItem("plateTrackHistory");
+
+        if(!data){
+            return [];
+        }
+
+        const parsed = JSON.parse(data);
+
+        return Array.isArray(parsed) ? parsed : [];
+
+    }
+    catch(error){
+
+        console.error("Unable to read violation history:",error);
+
+        return [];
+
+    }
 
 }
 
@@ -47,7 +64,7 @@ function loadHistory(data = null){
 
     emptyState.style.display = "none";
 
-    history.forEach(function(item,index){
+    history.forEach(function(item){
 
         historyList.innerHTML += `
             <div class="history-card">
@@ -99,7 +116,7 @@ function loadHistory(data = null){
                     <button
                     class="view-btn"
                     type="button"
-                    onclick="viewRecord(${index})">
+                    onclick="viewRecord('${item.recordId}')">
 
                         <i class="fa-solid fa-eye"></i>
                         View
@@ -109,7 +126,7 @@ function loadHistory(data = null){
                     <button
                     class="delete-btn"
                     type="button"
-                    onclick="deleteRecord(${index})">
+                    onclick="deleteRecord('${item.recordId}')">
 
                         <i class="fa-solid fa-trash"></i>
                         Delete
@@ -181,14 +198,16 @@ function applyFilters(){
 }
 
 // ==========================================
-// VIEW RECORD
+// VIEW RECORD (looked up by recordId)
 // ==========================================
 
-function viewRecord(index){
+function viewRecord(recordId){
 
     const history = getHistoryRecords();
 
-    const item = history[index];
+    const item = history.find(function(record){
+        return record.recordId === recordId;
+    });
 
     if(!item){
         return;
@@ -260,10 +279,10 @@ function closeDetailsModal(){
 }
 
 // ==========================================
-// DELETE RECORD
+// DELETE RECORD (looked up by recordId)
 // ==========================================
 
-function deleteRecord(index){
+function deleteRecord(recordId){
 
     showConfirm(
 
@@ -274,6 +293,14 @@ function deleteRecord(index){
         function(){
 
             let history = getHistoryRecords();
+
+            const index = history.findIndex(function(record){
+                return record.recordId === recordId;
+            });
+
+            if(index === -1){
+                return;
+            }
 
             history.splice(index,1);
 
