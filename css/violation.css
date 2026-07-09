@@ -1,348 +1,618 @@
+/* ==========================================
+   PLATETRACK
+   VIOLATION FORM
+========================================== */
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 }
 
+html{
+    scroll-behavior:smooth;
+}
+
 body{
+
     font-family:'Inter',sans-serif;
+
     background:#07111f;
-    color:white;
+
+    color:#ffffff;
+
     min-height:100vh;
 
+    overflow-x:hidden;
+
+}
+
+/* ==========================================
+   BACKGROUND
+========================================== */
+
+.background-grid{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:-2;
+
     background:
-    radial-gradient(circle at top, rgba(61,108,255,.18), transparent 40%),
-    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+    radial-gradient(circle at 20% 20%,rgba(61,108,255,.22),transparent 35%),
+    radial-gradient(circle at 80% 70%,rgba(61,108,255,.15),transparent 35%),
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px),
     #07111f;
 
-    background-size:100% 100%,50px 50px,50px 50px;
+    background-size:
+    100% 100%,
+    100% 100%,
+    45px 45px,
+    45px 45px;
+
+}
+
+/* ==========================================
+   CONTAINER
+========================================== */
+
+.violation-container{
+
+    max-width:540px;
+
+    margin:auto;
+
+    padding:20px 18px 80px;
+
+}
+
+/* ==========================================
+   TOP BAR
+========================================== */
+
+.topbar{
 
     display:flex;
-    justify-content:center;
+
     align-items:center;
-    padding:40px 20px;
+
+    justify-content:space-between;
+
+    margin-bottom:24px;
+
 }
 
-.container{
-    width:100%;
-    max-width:650px;
+.back-btn{
+
+    width:48px;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:rgba(255,255,255,.08);
+
+    color:#ffffff;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:.30s;
+
 }
+
+.back-btn:hover{
+
+    background:#3d6cff;
+
+    transform:translateY(-2px);
+
+}
+
+.top-space{
+
+    width:48px;
+
+}
+
+.page-title{
+
+    flex:1;
+
+    text-align:center;
+
+}
+
+.page-title h2{
+
+    font-size:24px;
+
+    font-weight:800;
+
+}
+
+.page-title p{
+
+    margin-top:4px;
+
+    color:#9fb2d8;
+
+    font-size:13px;
+
+}
+
+/* ==========================================
+   FORM CARD
+========================================== */
 
 .form-card{
-    background:#13233c;
+
+    background:rgba(17,30,53,.85);
+
+    backdrop-filter:blur(18px);
+
     border:1px solid rgba(255,255,255,.08);
+
+    border-radius:26px;
+
+    padding:28px;
+
+    box-shadow:
+    0 18px 40px rgba(0,0,0,.30);
+
+}
+
+.form-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin-bottom:28px;
+
+}
+
+.form-icon{
+
+    width:70px;
+
+    height:70px;
+
     border-radius:20px;
-    padding:35px;
+
+    background:linear-gradient(
+    135deg,
+    #3d6cff,
+    #6fa8ff);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:28px;
+
+    color:#ffffff;
+
+    box-shadow:
+    0 10px 25px rgba(61,108,255,.35);
+
 }
 
-.form-card h1{
-    text-align:center;
-    margin-bottom:10px;
+.form-header h3{
+
+    font-size:23px;
+
+    font-weight:800;
+
 }
 
-.form-card p{
-    text-align:center;
-    color:#9db0d4;
-    margin-bottom:30px;
+.form-header p{
+
+    margin-top:5px;
+
+    color:#9fb2d8;
+
+    font-size:14px;
+
+}
+
+/* ==========================================
+   SECTION TITLE
+========================================== */
+
+.card-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:30px;
+
+    margin-bottom:18px;
+
+    color:#82aaff;
+
+    font-weight:700;
+
+    font-size:16px;
+
+}
+
+.card-title i{
+
+    font-size:18px;
+
+}
+
+/* ==========================================
+   INPUTS
+========================================== */
+
+.input-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
 }
 
 .input-group{
+    display:flex;
+    flex-direction:column;
     margin-bottom:20px;
 }
 
 .input-group label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
+    margin-bottom:9px;
+    color:#dce7ff;
+    font-size:14px;
+    font-weight:700;
 }
 
 .input-group input,
 .input-group select,
 .input-group textarea{
-
     width:100%;
-    padding:14px;
     border:none;
-    border-radius:12px;
-
-    background:#22385c;
-    color:white;
+    outline:none;
+    border-radius:16px;
+    padding:15px 16px;
+    font-family:'Inter',sans-serif;
     font-size:15px;
+    background:#0f1d33;
+    color:#ffffff;
+    border:1px solid rgba(255,255,255,.09);
+    transition:.30s ease;
 }
 
 .input-group input:focus,
 .input-group select:focus,
 .input-group textarea:focus{
-
-    outline:2px solid #3d6cff;
+    border-color:#3d6cff;
+    box-shadow:0 0 0 3px rgba(61,108,255,.20);
 }
 
-.submit-btn{
-
-    width:100%;
-    padding:16px;
-
-    border:none;
-    border-radius:14px;
-
-    background:#3d6cff;
-    color:white;
-
-    font-size:17px;
-    font-weight:bold;
-
-    cursor:pointer;
-
-    transition:.3s;
+.input-group input::placeholder,
+.input-group textarea::placeholder{
+    color:#697b9c;
 }
 
-.submit-btn:hover{
-
-    background:#2b58e8;
+.input-group input[readonly]{
+    background:rgba(255,255,255,.06);
+    color:#b9c9e6;
+    cursor:not-allowed;
 }
 
-@media(max-width:768px){
-
-.form-card{
-
-padding:25px;
-
+.input-group textarea{
+    resize:vertical;
+    min-height:120px;
 }
 
+.input-group select option{
+    background:#0f1d33;
+    color:#ffffff;
 }
 
-.error{
+/* ==========================================
+   BUTTONS
+========================================== */
 
-    display:block;
-    color:#ff4d4f;
-    font-size:13px;
-    margin-top:6px;
-    min-height:18px;
-
-}
-
-.input-error{
-
-    border:2px solid #ff4d4f !important;
-
-}
-
-.hint{
-
-    display:block;
-    color:#9db0d4;
-    font-size:12px;
-    margin-top:6px;
-    margin-bottom:4px;
-
-}
-
-.counter{
-
-    display:block;
-
-    text-align:right;
-
-    margin-top:6px;
-
-    color:#9db0d4;
-
-    font-size:12px;
-
-}
-
-/* ===============================
-   SUCCESS MODAL
-================================ */
-
-.modal{
-
-    display:none;
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:100%;
-
-    background:rgba(0,0,0,.55);
-
-    justify-content:center;
-    align-items:center;
-
-    z-index:999;
-
-    animation:fadeIn .25s ease;
-
-}
-
-.modal-content{
-
-    width:90%;
-    max-width:430px;
-
-    background:#13233c;
-
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:22px;
-
-    padding:35px;
-
-    text-align:center;
-
-    animation:popUp .25s ease;
-
-}
-
-.success-icon{
-
-    font-size:60px;
-
-    margin-bottom:15px;
-
-}
-
-.modal-content h2{
-
-    margin-bottom:10px;
-
-}
-
-.modal-content p{
-
-    color:#9db0d4;
-
-}
-
-.summary{
-
-    margin:25px 0;
-
-    padding:18px;
-
-    border-radius:15px;
-
-    background:#22385c;
-
-    text-align:left;
-
-}
-
-.summary p{
-
-    margin:10px 0;
-
-    color:white;
-
-}
-
-.modal-buttons{
+.button-group{
 
     display:flex;
-
-    gap:15px;
-
-    margin-top:20px;
+    gap:16px;
+    margin-top:32px;
 
 }
 
-.modal-buttons button{
+.cancel-btn,
+.save-btn{
 
     flex:1;
 
-    padding:14px;
-
     border:none;
 
-    border-radius:12px;
+    border-radius:18px;
+
+    padding:17px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+
+    font-size:16px;
+    font-weight:700;
 
     cursor:pointer;
 
-    font-size:15px;
-
-    font-weight:bold;
-
-    transition:.3s;
+    transition:.30s ease;
 
 }
 
-.history-btn{
+.cancel-btn{
+
+    background:#2b364b;
+    color:#ffffff;
+
+}
+
+.cancel-btn:hover{
+
+    background:#42516d;
+    transform:translateY(-3px);
+
+}
+
+.save-btn{
+
+    background:linear-gradient(
+        135deg,
+        #3d6cff,
+        #6fa8ff
+    );
+
+    color:#ffffff;
+
+    box-shadow:
+        0 18px 40px rgba(61,108,255,.35);
+
+}
+
+.save-btn:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 24px 50px rgba(61,108,255,.45);
+
+}
+
+/* ==========================================
+   ANIMATIONS
+========================================== */
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+        transform:translateY(25px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+.form-card{
+
+    animation:fadeUp .45s ease;
+
+}
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#07111f;
+
+}
+
+::-webkit-scrollbar-thumb{
 
     background:#3d6cff;
-
-    color:white;
-
-}
-
-.history-btn:hover{
-
-    background:#2b58e8;
+    border-radius:20px;
 
 }
 
-.dashboard-btn{
+::-webkit-scrollbar-thumb:hover{
 
-    background:#1c2e4d;
-
-    color:white;
+    background:#5b8cff;
 
 }
 
-.dashboard-btn:hover{
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
-    background:#304d7d;
+@media(max-width:768px){
 
-}
+    .violation-container{
 
-/* ===============================
-   ANIMATIONS
-================================ */
-
-@keyframes fadeIn{
-
-    from{
-
-        opacity:0;
+        padding:18px 16px 40px;
 
     }
 
-    to{
+    .form-card{
 
-        opacity:1;
+        padding:22px;
+
+    }
+
+    .input-row{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .button-group{
+
+        flex-direction:column;
 
     }
 
 }
 
-@keyframes popUp{
+@media(max-width:480px){
 
-    from{
+    .page-title h2{
 
-        transform:scale(.85);
-
-        opacity:0;
+        font-size:21px;
 
     }
 
-    to{
+    .page-title p{
 
-        transform:scale(1);
+        font-size:12px;
 
-        opacity:1;
+    }
+
+    .form-header{
+
+        flex-direction:column;
+        text-align:center;
+
+    }
+
+    .form-icon{
+
+        width:64px;
+        height:64px;
+        font-size:25px;
+
+    }
+
+    .form-header h3{
+
+        font-size:21px;
+
+    }
+
+    .card-title{
+
+        font-size:15px;
+
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea{
+
+        font-size:14px;
+        padding:14px;
+
+    }
+
+    .cancel-btn,
+    .save-btn{
+
+        font-size:15px;
+        padding:16px;
 
     }
 
 }
 
-@media(max-width:600px){
+/* ==========================================
+   LIGHT MODE - MANUAL VIOLATION
+========================================== */
 
-.modal-buttons{
-
-    flex-direction:column;
-
+body.light-mode{
+    background:#eef3fb;
+    color:#132033;
 }
 
+body.light-mode .background-grid{
+    background:
+    radial-gradient(circle at 20% 20%,rgba(61,108,255,.13),transparent 35%),
+    radial-gradient(circle at 82% 68%,rgba(17,122,101,.12),transparent 36%),
+    linear-gradient(rgba(19,32,51,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(19,32,51,.055) 1px,transparent 1px),
+    #eef3fb;
+}
+
+body.light-mode .form-card{
+    background:#ffffff !important;
+    color:#132033 !important;
+    border:1px solid rgba(36,58,88,.10) !important;
+    box-shadow:0 18px 36px rgba(36,58,88,.12) !important;
+}
+
+body.light-mode .page-title h2,
+body.light-mode .form-header h3,
+body.light-mode .input-group label{
+    color:#132033 !important;
+}
+
+body.light-mode .page-title p,
+body.light-mode .form-header p{
+    color:#52627a !important;
+}
+
+body.light-mode .back-btn,
+body.light-mode .cancel-btn{
+    background:#ffffff !important;
+    color:#132033 !important;
+    border:1px solid rgba(36,58,88,.10) !important;
+    box-shadow:0 12px 28px rgba(36,58,88,.10) !important;
+}
+
+body.light-mode .input-group input,
+body.light-mode .input-group select,
+body.light-mode .input-group textarea{
+    background:#f7f9fc !important;
+    color:#132033 !important;
+    border:1px solid rgba(36,58,88,.12) !important;
+}
+
+body.light-mode .input-group input::placeholder,
+body.light-mode .input-group textarea::placeholder{
+    color:#64748b !important;
+}
+
+body.light-mode .input-group input[readonly]{
+    background:#eef3fb !important;
+    color:#52627a !important;
+}
+
+body.light-mode .input-group select option{
+    background:#ffffff !important;
+    color:#132033 !important;
+}
+
+body.light-mode::-webkit-scrollbar-track{
+    background:#dce5f2;
 }

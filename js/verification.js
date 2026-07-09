@@ -1,169 +1,252 @@
 // =========================================
-// PlateTrack - Email Verification
+// PlateTrack | Email Verification
 // =========================================
 
-const codeInputs = document.querySelectorAll(".code-input");
-const verifyBtn = document.getElementById("verifyBtn");
-const resendBtn = document.getElementById("resendCode");
+document.addEventListener("DOMContentLoaded", () => {
 
-// =========================================
-// OTP Input Behavior
-// =========================================
+    const form = document.getElementById("verificationForm");
+    const inputs = document.querySelectorAll(".code-input");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const resendBtn = document.getElementById("resendCode");
+    const verificationBox = document.getElementById("verificationBox");
+    const maskedEmail = document.getElementById("maskedEmail");
 
-codeInputs.forEach((input, index) => {
+    function maskEmail(email){
+        const parts = email.split("@");
 
-    // Numbers Only
-
-    input.addEventListener("input", function () {
-
-        this.value = this.value.replace(/[^0-9]/g, "");
-
-        if (this.value.length === 1 && index < codeInputs.length - 1) {
-
-            codeInputs[index + 1].focus();
-
+        if(parts.length !== 2){
+            return email;
         }
 
-    });
+        const name = parts[0];
+        const domain = parts[1];
+        const visible = name.length <= 2 ? name[0] : name.slice(0,2);
 
-    // Backspace
-
-    input.addEventListener("keydown", function (e) {
-
-        if (e.key === "Backspace" &&
-            this.value === "" &&
-            index > 0) {
-
-            codeInputs[index - 1].focus();
-
-        }
-
-    });
-
-});
-
-
-// =========================================
-// Paste Support
-// =========================================
-
-codeInputs[0].addEventListener("paste", function (e) {
-
-    e.preventDefault();
-
-    const pasteData = (e.clipboardData || window.clipboardData)
-        .getData("text")
-        .replace(/\D/g, "")
-        .slice(0, 6);
-
-    pasteData.split("").forEach((digit, i) => {
-
-        if (codeInputs[i]) {
-
-            codeInputs[i].value = digit;
-
-        }
-
-    });
-
-    if (pasteData.length > 0) {
-
-        codeInputs[Math.min(pasteData.length - 1, 5)].focus();
-
+        return `${visible}${"*".repeat(Math.max(name.length - 2, 4))}@${domain}`;
     }
 
-});
+    const storedEmail =
+        localStorage.getItem("resetEmail") ||
+        localStorage.getItem("officerEmail") ||
+        "officer@platetrack.gov.ph";
 
-
-// =========================================
-// Verify Code
-// =========================================
-
-verifyBtn.addEventListener("click", function () {
-
-    let otp = "";
-
-    codeInputs.forEach(input => {
-
-        otp += input.value;
-
-    });
-
-    if (otp.length !== 6) {
-
-        showError(
-
-            "Incomplete Code",
-
-            "Please enter the complete 6-digit verification code."
-
-        );
-
-        return;
-
+    if(maskedEmail){
+        maskedEmail.textContent = maskEmail(storedEmail);
     }
 
-    verifyBtn.disabled = true;
+    // OTP input behavior
 
-    verifyBtn.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Verifying...
-    `;
+    inputs.forEach((input, index) => {
 
-    // Simulate Server Verification
+        input.addEventListener("input", function () {
 
-    setTimeout(function () {
+            this.value = this.value.replace(/\D/g, "");
 
-        verifyBtn.disabled = false;
+            if(this.value !== ""){
+                this.classList.add("filled");
+            }else{
+                this.classList.remove("filled");
+            }
 
-        verifyBtn.innerHTML = "Verify Code";
+            if(this.value.length === 1 && index < inputs.length - 1){
+                inputs[index + 1].focus();
+            }
 
-        showSuccess(
+        });
 
-            "Verification Successful",
+        input.addEventListener("keydown", function (e) {
 
-            "Your verification code has been verified successfully.",
+            if(e.key === "Backspace"){
 
-            function () {
-
-                window.location.href = "reset-password.html";
+                if(this.value === "" && index > 0){
+                    inputs[index - 1].focus();
+                }else{
+                    this.value = "";
+                    this.classList.remove("filled");
+                    this.classList.remove("success");
+                }
 
             }
 
-        );
+        });
 
-    }, 2000);
+    });
 
-});
+    // Paste support
 
+    inputs[0].addEventListener("paste", function (e) {
 
-// =========================================
-// Resend Code
-// =========================================
+        e.preventDefault();
 
-resendBtn.addEventListener("click", function () {
+        const paste = (e.clipboardData || window.clipboardData)
+            .getData("text")
+            .replace(/\D/g, "")
+            .slice(0, 6);
 
-    resendBtn.disabled = true;
+        paste.split("").forEach((digit, i) => {
 
-    resendBtn.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Sending...
-    `;
+            if(inputs[i]){
+                inputs[i].value = digit;
+                inputs[i].classList.add("filled");
+            }
 
-    setTimeout(function () {
+        });
 
-        resendBtn.disabled = false;
+        if(paste.length < 6){
+            inputs[paste.length].focus();
+        }else{
+            inputs[5].focus();
+        }
 
-        resendBtn.innerHTML = "Resend Code";
+    });
 
-        showSuccess(
+    // Verify code
 
-            "Verification Code Sent",
+    form.addEventListener("submit", function (e) {
 
-            "A new verification code has been sent to your registered email address."
+        e.preventDefault();
 
-        );
+        let otp = "";
 
-    }, 2000);
+        inputs.forEach(input => {
+            otp += input.value;
+        });
+
+        if(otp.length !== 6){
+
+            verificationBox.classList.add("shake");
+
+            inputs.forEach(input => {
+                if(input.value === ""){
+                    input.classList.add("error");
+                }
+            });
+
+            setTimeout(() => {
+
+                verificationBox.classList.remove("shake");
+
+                inputs.forEach(input => {
+                    input.classList.remove("error");
+                });
+
+            }, 400);
+
+            showError(
+                "Incomplete Code",
+                "Please enter the complete 6-digit verification code."
+            );
+
+            return;
+        }
+
+        verifyBtn.disabled = true;
+        verifyBtn.classList.add("loading");
+
+        verifyBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Verifying...
+        `;
+
+        setTimeout(() => {
+
+            verifyBtn.classList.remove("loading");
+
+            inputs.forEach(input => {
+                input.classList.add("success");
+            });
+
+            verifyBtn.innerHTML = `
+                <i class="fa-solid fa-circle-check"></i>
+                Code Verified
+            `;
+
+            setTimeout(() => {
+
+                showSuccess(
+                    "Verification Successful",
+                    "Your identity has been successfully verified.<br><br>You may now create a new password.",
+                    () => {
+                        window.location.href = "reset-password.html";
+                    },
+                    "Continue"
+                );
+
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = "Verify Code";
+
+            }, 900);
+
+        }, 1800);
+
+    });
+
+    // Enter key
+
+    inputs.forEach(input => {
+
+        input.addEventListener("keyup", function (e) {
+
+            if(e.key === "Enter"){
+                form.requestSubmit();
+            }
+
+        });
+
+    });
+
+    // Resend timer
+
+    let countdown = 60;
+    let timer;
+
+    function startResendTimer(){
+
+        resendBtn.disabled = true;
+        resendBtn.textContent = `Resend in ${countdown}s`;
+
+        timer = setInterval(() => {
+
+            countdown--;
+            resendBtn.textContent = `Resend in ${countdown}s`;
+
+            if(countdown <= 0){
+                clearInterval(timer);
+                resendBtn.disabled = false;
+                resendBtn.textContent = "Resend Code";
+            }
+
+        }, 1000);
+
+    }
+
+    startResendTimer();
+
+    // Resend code
+
+    resendBtn.addEventListener("click", function () {
+
+        resendBtn.disabled = true;
+
+        resendBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Sending...
+        `;
+
+        setTimeout(() => {
+
+            showSuccess(
+                "Verification Code Sent",
+                "A new 6-digit verification code has been sent to your registered email address.",
+                null,
+                "OK"
+            );
+
+            countdown = 60;
+            startResendTimer();
+
+        }, 1600);
+
+    });
 
 });

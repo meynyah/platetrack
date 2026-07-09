@@ -33,7 +33,7 @@
 
             <div class="logo-box">
 
-                🛡️
+                <i class="fa-solid fa-shield-halved"></i>
 
             </div>
 
@@ -106,12 +106,18 @@
                         First Name
 
                     </label>
+                    
+                    <div class="input-box">
 
-                    <input
-                    id="firstName"
-                    type="text"
-                    placeholder="Enter first name"
-                    required>
+                        <i class="fa-solid fa-user input-icon"></i>
+
+                        <input
+                        id="firstName"
+                        type="text"
+                        placeholder="Enter first name"
+                        required>
+
+                    </div>
 
                 </div>
 
@@ -123,10 +129,16 @@
 
                     </label>
 
-                    <input
-                    id="middleName"
-                    type="text"
-                    placeholder="Enter middle name (Optional)">
+                    <div class="input-box">
+
+                        <i class="fa-solid fa-user input-icon"></i>
+
+                        <input
+                        id="middleName"
+                        type="text"
+                        placeholder="Enter middle name (Optional)">
+
+                    </div>
 
                 </div>
 
@@ -138,11 +150,17 @@
 
                     </label>
 
-                    <input
-                    id="lastName"
-                    type="text"
-                    placeholder="Enter last name"
-                    required>
+                    <div class="input-box">
+
+                        <i class="fa-solid fa-user input-icon"></i>
+
+                        <input
+                        id="lastName"
+                        type="text"
+                        placeholder="Enter last name"
+                        required>
+
+                    </div>
 
                 </div>
 
@@ -154,27 +172,17 @@
 
                     </label>
 
-                    <input
-                    id="badgeNumber"
-                    type="text"
-                    placeholder="e.g. APD-1024"
-                    required>
+                    <div class="input-box">
 
-                </div>
+                        <i class="fa-solid fa-id-badge input-icon"></i>
 
-                <div class="input-group">
+                        <input
+                        id="badgeNumber"
+                        type="text"
+                        placeholder="e.g. APD-1024"
+                        required>
 
-                    <label>
-
-                        Employee ID
-
-                    </label>
-
-                    <input
-                    id="employeeID"
-                    type="text"
-                    placeholder="e.g. 2026-001"
-                    required>
+                    </div>
 
                 </div>
 
@@ -208,11 +216,17 @@
 
                     </label>
 
-                    <input
-                    id="email"
-                    type="email"
-                    placeholder="officer@platetrack.gov.ph"
-                    required>
+                    <div class="input-box">
+
+                        <i class="fa-solid fa-envelope input-icon"></i>
+
+                        <input
+                        id="email"
+                        type="email"
+                        placeholder="officer@platetrack.gov.ph"
+                        required>
+                    
+                    </div>
 
                 </div>
 
@@ -224,11 +238,17 @@
 
                     </label>
 
-                    <input
-                    id="mobile"
-                    type="tel"
-                    maxlength="11"
-                    placeholder="09XXXXXXXXX">
+                    <div class="input-box">
+
+                        <i class="fa-solid fa-phone input-icon"></i>
+
+                        <input
+                        id="mobile"
+                        type="tel"
+                        maxlength="11"
+                        placeholder="09XXXXXXXXX">
+
+                    </div>
 
                 </div>
 
@@ -240,7 +260,9 @@
 
                     </label>
 
-                    <div class="password-box">
+                    <div class="password-box input-box">
+
+                        <i class="fa-solid fa-lock input-icon"></i>
 
                         <input
                         id="password"
@@ -268,7 +290,11 @@
 
                     </label>
 
-                    <div class="password-box">
+                    <div class="password-box input-box">
+
+                        <i
+                        id="confirmIcon"
+                        class="fa-solid fa-lock-open input-icon"></i>
 
                         <input
                         id="confirmPassword"
@@ -286,6 +312,11 @@
 
                     </div>
 
+                        <div
+                            id="passwordMatch"
+                            class="password-match">
+                        </div>
+
                 </div>
 
                 <!-- PASSWORD REQUIREMENTS -->
@@ -296,7 +327,7 @@
 
                     <div class="rule" id="ruleLength">
 
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-regular fa-circle"></i>
 
                         Minimum 8 characters
 
@@ -304,7 +335,7 @@
 
                     <div class="rule" id="ruleUpper">
 
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-regular fa-circle"></i>
 
                         One uppercase letter
 
@@ -312,7 +343,7 @@
 
                     <div class="rule" id="ruleLower">
 
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-regular fa-circle"></i>
 
                         One lowercase letter
 
@@ -320,7 +351,7 @@
 
                     <div class="rule" id="ruleNumber">
 
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-regular fa-circle"></i>
 
                         One number
 
@@ -328,7 +359,7 @@
 
                     <div class="rule" id="ruleSpecial">
 
-                        <i class="fa-solid fa-circle-xmark"></i>
+                        <i class="fa-regular fa-circle"></i>
 
                         One special character
 
@@ -345,9 +376,7 @@
                         <span>Password Strength</span>
 
                         <span id="strengthText">
-
-                            Weak
-
+                            —
                         </span>
 
                     </div>

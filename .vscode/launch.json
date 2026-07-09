@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open PlateTrack",
+            "file": "${workspaceFolder}/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open Profile",
+            "file": "${workspaceFolder}/profile.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open Dashboard",
+            "file": "${workspaceFolder}/enforcer-dashboard.html"
+        }
+    ]
+}

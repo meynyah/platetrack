@@ -404,6 +404,7 @@ body{
     color:#dce7ff;
 
 }
+.input-group input,
 
 .input-group select,
 
@@ -433,6 +434,8 @@ body{
 
 }
 
+.input-group input:focus,
+
 .input-group select:focus,
 
 .input-group textarea:focus{
@@ -456,6 +459,32 @@ body{
     background:#0f1d33;
 
     color:#ffffff;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:16px;
+
+    padding:15px 16px;
+
+    font-size:15px;
+
+    font-family:'Inter',sans-serif;
+
+    background:#0f1d33;
+
+    color:#ffffff;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    transition:.30s;
 
 }
 
@@ -765,4 +794,82 @@ body{
 
 }
 
+}
+
+.captured-photo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:18px;
+}
+
+/* LIGHT MODE - DETECTION RESULT */
+body.light-mode{
+    background:#eef3fb;
+    color:#132033;
+}
+
+body.light-mode .background-grid{
+    background:
+        radial-gradient(circle at 20% 20%,rgba(61,108,255,.13),transparent 35%),
+        radial-gradient(circle at 82% 68%,rgba(17,122,101,.12),transparent 36%),
+        linear-gradient(rgba(19,32,51,.055) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(19,32,51,.055) 1px,transparent 1px),
+        #eef3fb;
+}
+
+body.light-mode .page-title h2,
+body.light-mode .plate-card h1,
+body.light-mode .info-card h3,
+body.light-mode .info-row strong{
+    color:#132033;
+}
+
+body.light-mode .page-title p,
+body.light-mode .plate-label,
+body.light-mode .info-row span,
+body.light-mode .capture-image p{
+    color:#52627a;
+}
+
+body.light-mode .capture-card,
+body.light-mode .plate-card,
+body.light-mode .info-card{
+    background:rgba(255,255,255,.9);
+    border-color:rgba(36,58,88,.10);
+    box-shadow:0 18px 36px rgba(36,58,88,.12);
+}
+
+body.light-mode .capture-image{
+    background:#f7f9fc;
+    border-color:rgba(61,108,255,.35);
+}
+
+body.light-mode .back-btn,
+body.light-mode .cancel-btn{
+    background:#ffffff;
+    color:#132033;
+    box-shadow:0 12px 28px rgba(36,58,88,.12);
+}
+
+body.light-mode .summary-item{
+    background:rgba(61,108,255,.10);
+    color:#334155;
+}
+
+body.light-mode .input-group label{
+    color:#334155;
+}
+
+body.light-mode .input-group input,
+body.light-mode .input-group select,
+body.light-mode .input-group textarea{
+    background:#f7f9fc;
+    color:#132033;
+    border-color:rgba(36,58,88,.12);
+}
+
+body.light-mode .input-group select option{
+    background:#ffffff;
+    color:#132033;
 }

@@ -1,267 +1,294 @@
 // =========================================
-// PlateTrack - Reset Password
+// PlateTrack | Reset Password
 // =========================================
 
-const newPassword = document.getElementById("newPassword");
-const confirmPassword = document.getElementById("confirmPassword");
+document.addEventListener("DOMContentLoaded", () => {
 
-const toggleNewPassword =
-document.getElementById("toggleNewPassword");
+    const form = document.getElementById("resetForm");
 
-const toggleConfirmPassword =
-document.getElementById("toggleConfirmPassword");
+    const newPassword = document.getElementById("newPassword");
+    const confirmPassword = document.getElementById("confirmPassword");
 
-const resetPasswordBtn =
-document.getElementById("resetPasswordBtn");
+    const toggleNewPassword = document.getElementById("toggleNewPassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
-const strengthFill =
-document.getElementById("strengthFill");
+    const resetPasswordBtn = document.getElementById("resetPasswordBtn");
 
-const strengthText =
-document.getElementById("strengthText");
+    const strengthFill = document.getElementById("strengthFill");
+    const strengthText = document.getElementById("strengthText");
 
-// =========================================
-// SHOW / HIDE PASSWORD
-// =========================================
+    const confirmIcon =
+    document.getElementById("confirmIcon");
 
-function togglePassword(input, button){
+    const passwordMatch =
+    document.getElementById("passwordMatch");
 
-    if(input.type === "password"){
+    const rules = {
+        length: document.getElementById("ruleLength"),
+        upper: document.getElementById("ruleUpper"),
+        lower: document.getElementById("ruleLower"),
+        number: document.getElementById("ruleNumber"),
+        special: document.getElementById("ruleSpecial")
+    };
 
-        input.type = "text";
+    function togglePassword(input, button){
 
-        button.innerHTML =
-        '<i class="fa-solid fa-eye-slash"></i>';
+        const icon = button.querySelector("i");
 
-    }else{
-
-        input.type = "password";
-
-        button.innerHTML =
-        '<i class="fa-solid fa-eye"></i>';
-
-    }
-
-}
-
-toggleNewPassword.addEventListener("click",function(){
-
-    togglePassword(newPassword,toggleNewPassword);
-
-});
-
-toggleConfirmPassword.addEventListener("click",function(){
-
-    togglePassword(confirmPassword,toggleConfirmPassword);
-
-});
-
-// =========================================
-// PASSWORD RULES
-// =========================================
-
-const rules = {
-
-    length:document.getElementById("ruleLength"),
-
-    upper:document.getElementById("ruleUpper"),
-
-    lower:document.getElementById("ruleLower"),
-
-    number:document.getElementById("ruleNumber"),
-
-    special:document.getElementById("ruleSpecial")
-
-};
-
-function updateRule(rule,valid){
-
-    if(valid){
-
-        rule.classList.add("valid");
-
-        rule.querySelector("i").className =
-        "fa-solid fa-circle-check";
-
-    }else{
-
-        rule.classList.remove("valid");
-
-        rule.querySelector("i").className =
-        "fa-solid fa-circle-xmark";
+        if(input.type === "password"){
+            input.type = "text";
+            icon.className = "fa-solid fa-eye-slash";
+        }else{
+            input.type = "password";
+            icon.className = "fa-solid fa-eye";
+        }
 
     }
 
-}
+    toggleNewPassword.addEventListener("click", () => {
+        togglePassword(newPassword, toggleNewPassword);
+    });
 
-newPassword.addEventListener("input",checkPassword);
+    toggleConfirmPassword.addEventListener("click", () => {
+        togglePassword(confirmPassword, toggleConfirmPassword);
+    });
 
-function checkPassword(){
+    function updateRule(rule, valid,hasTyped){
 
-    const password = newPassword.value;
+        const icon = rule.querySelector("i");
 
-    const hasLength = password.length >= 8;
+        rule.classList.remove("valid", "invalid");
 
-    const hasUpper = /[A-Z]/.test(password);
+        if(!hasTyped){
+            icon.className = "fa-regular fa-circle";
+            return;
+        }
 
-    const hasLower = /[a-z]/.test(password);
-
-    const hasNumber = /[0-9]/.test(password);
-
-    const hasSpecial =
-    /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    updateRule(rules.length,hasLength);
-
-    updateRule(rules.upper,hasUpper);
-
-    updateRule(rules.lower,hasLower);
-
-    updateRule(rules.number,hasNumber);
-
-    updateRule(rules.special,hasSpecial);
-
-    let score = 0;
-
-    if(hasLength) score++;
-
-    if(hasUpper) score++;
-
-    if(hasLower) score++;
-
-    if(hasNumber) score++;
-
-    if(hasSpecial) score++;
-
-    if(score <= 1){
-
-        strengthFill.style.width = "20%";
-
-        strengthFill.style.background = "#dc3545";
-
-        strengthText.innerHTML =
-        "Password Strength: Weak";
+        if(valid){
+            rule.classList.add("valid");
+            icon.className = "fa-solid fa-circle-check";
+        }else{
+            rule.classList.add("invalid");
+            icon.className = "fa-solid fa-circle-xmark";
+        }
 
     }
 
-    else if(score == 2){
+    function checkPassword(){
 
-        strengthFill.style.width = "40%";
+        const password = newPassword.value;
 
-        strengthFill.style.background = "#ff9800";
+        const hasLength = password.length >= 8;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        const hasTyped = password.length > 0;
 
-        strengthText.innerHTML =
-        "Password Strength: Fair";
 
-    }
+        updateRule(rules.length, hasLength, hasTyped);
+        updateRule(rules.upper, hasUpper, hasTyped);
+        updateRule(rules.lower, hasLower, hasTyped);
+        updateRule(rules.number, hasNumber, hasTyped);
+        updateRule(rules.special, hasSpecial, hasTyped);
 
-    else if(score == 3 || score == 4){
+        let score = 0;
 
-        strengthFill.style.width = "75%";
+        if(hasLength) score++;
+        if(hasUpper) score++;
+        if(hasLower) score++;
+        if(hasNumber) score++;
+        if(hasSpecial) score++;
 
-        strengthFill.style.background = "#facc15";
+        if(!hasTyped){
+            strengthFill.style.width = "0%";
+            strengthText.textContent = "-";
+            strengthText.style.color = "#94a3b8";
 
-        strengthText.innerHTML =
-        "Password Strength: Good";
+            return {
+                hasLength,
+                hasUpper,
+                hasLower,
+                hasNumber,
+                hasSpecial,
+                score
+            };
+        }
 
-    }
+        if(score <= 1){
+            strengthFill.style.width = "20%";
+            strengthFill.style.background = "#ef4444";
+            strengthText.textContent = "Weak";
+            strengthText.style.color = "#f87171";
+        }else if(score === 2){
+            strengthFill.style.width = "40%";
+            strengthFill.style.background = "#f97316";
+            strengthText.textContent = "Fair";
+            strengthText.style.color = "#fb923c";
+        }else if(score === 3 || score === 4){
+            strengthFill.style.width = "75%";
+            strengthFill.style.background = "#facc15";
+            strengthText.textContent = "Good";
+            strengthText.style.color = "#fde047";
+        }else{
+            strengthFill.style.width = "100%";
+            strengthFill.style.background = "#22c55e";
+            strengthText.textContent = "Strong";
+            strengthText.style.color = "#4ade80";
+        }
 
-    else{
-
-        strengthFill.style.width = "100%";
-
-        strengthFill.style.background = "#22c55e";
-
-        strengthText.innerHTML =
-        "Password Strength: Strong";
-
-    }
-
-}
-
-// =========================================
-// RESET PASSWORD
-// =========================================
-
-resetPasswordBtn.addEventListener("click",function(){
-
-    const password = newPassword.value;
-
-    const confirm = confirmPassword.value;
-
-    if(password === "" || confirm === ""){
-
-        showError(
-
-            "Missing Information",
-
-            "Please complete all required fields."
-
-        );
-
-        return;
-
-    }
-
-    if(password !== confirm){
-
-        showError(
-
-            "Password Mismatch",
-
-            "The passwords do not match."
-
-        );
-
-        return;
-
-    }
-
-    if(password.length < 8){
-
-        showError(
-
-            "Weak Password",
-
-            "Please create a stronger password."
-
-        );
-
-        return;
+        return {
+            hasLength,
+            hasUpper,
+            hasLower,
+            hasNumber,
+            hasSpecial,
+            score
+        };
 
     }
 
-    resetPasswordBtn.disabled = true;
+    function checkPasswordMatch(){
 
-    resetPasswordBtn.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Updating Password...
-    `;
+        const password = newPassword.value;
+        const confirm = confirmPassword.value;
+        const box = confirmPassword.parentElement;
 
-    // Simulate Server
+        if(confirm === ""){
 
-    setTimeout(function(){
+            passwordMatch.textContent = "";
 
-        resetPasswordBtn.disabled = false;
+            box.classList.remove("success", "error");
 
-        resetPasswordBtn.innerHTML =
-        "Reset Password";
+            confirmIcon.className =
+            "fa-solid fa-lock-open input-icon";
 
-        showSuccess(
+            return;
 
-            "Password Updated",
+        }
 
-            "Your password has been updated successfully.",
+        if(password === confirm){
 
-            function(){
+            passwordMatch.innerHTML =
+            '<i class="fa-solid fa-circle-check"></i> Passwords match';
 
-                window.location.href =
-                "enforcer-login.html";
+            passwordMatch.className =
+            "password-match success";
 
-            }
+            box.classList.remove("error");
+            box.classList.add("success");
 
-        );
+            confirmIcon.className =
+            "fa-solid fa-circle-check input-icon";
 
-    },2000);
+        }else{
+
+            passwordMatch.innerHTML =
+            '<i class="fa-solid fa-circle-xmark"></i> Passwords do not match';
+
+            passwordMatch.className =
+            "password-match error";
+
+            box.classList.remove("success");
+            box.classList.add("error");
+
+            confirmIcon.className =
+            "fa-solid fa-circle-xmark input-icon";
+
+        }
+
+    }
+
+        newPassword.addEventListener("input", () => {
+
+            checkPassword();
+
+            checkPasswordMatch();
+
+        });
+
+        confirmPassword.addEventListener("input", checkPasswordMatch);
+
+    form.addEventListener("submit", (e) => {
+
+        e.preventDefault();
+
+        const password = newPassword.value.trim();
+        const confirm = confirmPassword.value.trim();
+        const result = checkPassword();
+
+        if(password === "" || confirm === ""){
+
+            showError(
+                "Missing Information",
+                "Please complete all required password fields."
+            );
+
+            return;
+
+        }
+
+        if(result.score < 5){
+
+            showError(
+                "Weak Password",
+                "Please follow all password requirements before continuing."
+            );
+
+            return;
+
+        }
+
+        if(password !== confirm){
+
+            showError(
+                "Password Mismatch",
+                "The passwords do not match. Please check your new password and confirmation."
+            );
+
+            return;
+
+        }
+
+        resetPasswordBtn.disabled = true;
+        resetPasswordBtn.classList.add("loading");
+
+        resetPasswordBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Updating Password...
+        `;
+
+        setTimeout(() => {
+
+            resetPasswordBtn.classList.remove("loading");
+            resetPasswordBtn.classList.add("success");
+
+            resetPasswordBtn.innerHTML = `
+                <i class="fa-solid fa-circle-check"></i>
+                Password Updated
+            `;
+
+            setTimeout(() => {
+
+                showSuccess(
+                    "Password Updated",
+                    "Your PlateTrack password has been updated successfully.<br><br>You may now sign in using your new password.",
+                    () => {
+                        window.location.href = "enforcer-login.html";
+                    },
+                    "Sign In Now"
+                );
+
+                resetPasswordBtn.disabled = false;
+                resetPasswordBtn.classList.remove("success");
+                resetPasswordBtn.innerHTML = "Reset Password";
+
+            }, 900);
+
+        }, 1800);
+
+    });
+
+    checkPassword();
 
 });

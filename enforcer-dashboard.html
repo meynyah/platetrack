@@ -43,67 +43,77 @@ TOP BAR
 
 <header class="topbar">
 
-<div class="logo">
+    <div class="logo">
 
-🛡️ PlateTrack
+        <i class="fa-solid fa-shield-halved"></i>
 
-</div>
+        <span>
 
-<div class="top-actions">
+            PlateTrack
 
-<button
-class="notification-btn"
-onclick="openNotificationModal()">
+        </span>
 
-<i class="fa-solid fa-bell"></i>
+    </div>
 
-<span
-id="notificationCount"
-class="notification-count">
+    <div class="top-actions">
 
-0
+        <button
+        class="notification-btn"
+        type="button"
+        onclick="openNotificationModal()"
+        aria-label="Open notifications">
 
-</span>
+            <i class="fa-solid fa-bell"></i>
 
-</button>
+            <span
+            id="notificationCount"
+            class="notification-count">
 
-<div class="menu-wrapper">
+                0
 
-<button
-class="menu-btn"
-onclick="toggleMenu()">
+            </span>
 
-<i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
 
-</button>
+        <div class="menu-wrapper">
 
-<div
-id="headerMenu"
-class="header-menu">
+            <button
+            class="menu-btn"
+            type="button"
+            onclick="toggleMenu()"
+            aria-label="Open menu">
 
-<a href="#">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
 
-<i class="fa-solid fa-gear"></i>
+            </button>
 
-Settings
+            <div
+            id="headerMenu"
+            class="header-menu">
 
-</a>
+                <a href="settings.html">
 
-<a
-href="#"
-onclick="confirmLogout(); return false;">
+                    <i class="fa-solid fa-gear"></i>
 
-<i class="fa-solid fa-right-from-bracket"></i>
+                    Settings
 
-Logout
+                </a>
 
-</a>
+                <a
+                href="#"
+                onclick="confirmLogout(); return false;">
 
-</div>
+                    <i class="fa-solid fa-right-from-bracket"></i>
 
-</div>
+                    Logout
 
-</div>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </header>
 
@@ -113,62 +123,67 @@ WELCOME CARD
 
 <section class="welcome-card">
 
-<div class="avatar">
+    <div class="avatar">
 
-👮
+        <i class="fa-solid fa-user-shield"></i>
 
-</div>
+    </div>
 
-<div class="welcome-content">
+    <div class="welcome-content">
 
-<p
-id="greeting"
-class="greeting">
+        <p
+        id="greeting"
+        class="greeting">
 
-Good Morning ☀️
+            Good Morning ☀️
 
-</p>
+        </p>
 
-<h1
-id="officerName">
+        <h1 id="officerName">
 
-Juan Dela Cruz
+            Juan Dela Cruz
 
-</h1>
+        </h1>
 
-<p class="badge-number">
+        <p class="badge-number">
 
-Badge No. ATC-2026-014
+            Badge No. ATC-2026-014
 
-</p>
+        </p>
 
-<div class="info-row">
+        <div class="info-row">
 
-<span class="status">
+            <span class="status">
 
-🟢 On Duty
+                <i class="fa-solid fa-circle"></i>
 
-</span>
+                On Duty
 
-<span class="date-time">
+            </span>
 
-📅 <span id="todayDate"></span>
+            <span class="date-time">
 
-&nbsp;&nbsp;•&nbsp;&nbsp;
+                <i class="fa-solid fa-calendar-days"></i>
 
-🕒 <span id="liveTime"></span>
+                <span id="todayDate"></span>
 
-</span>
+                <span class="dot-separator">•</span>
 
-</div>
+                <i class="fa-solid fa-clock"></i>
 
-<p class="welcome-message">
+                <span id="liveTime"></span>
 
-Ready for today's patrol? Stay alert and keep Antipolo roads safe.
+            </span>
 
-</p>
+        </div>
 
-</div>
+        <p class="welcome-message">
+
+            Ready for today's patrol? Stay alert and keep Antipolo roads safe.
+
+        </p>
+
+    </div>
 
 </section>
 
@@ -180,6 +195,7 @@ SCAN HERO
 
     <button
     class="scan-btn"
+    type="button"
     onclick="startDetection()">
 
         <div class="scan-circle">
@@ -312,6 +328,7 @@ QUICK ACTIONS
 
         <button
         class="action-card"
+        type="button"
         onclick="startDetection()">
 
             <div class="action-icon">
@@ -330,7 +347,8 @@ QUICK ACTIONS
 
         <button
         class="action-card"
-        onclick="window.location.href='manual-violation.html'">
+        type="button"
+        onclick="window.location.href='violation-form.html'">
 
             <div class="action-icon">
 
@@ -348,17 +366,18 @@ QUICK ACTIONS
 
         <button
         class="action-card"
-        onclick="window.location.href='registered-vehicles.html'">
+        type="button"
+        onclick="window.location.href='history.html'">
 
             <div class="action-icon">
 
-                <i class="fa-solid fa-car-side"></i>
+                <i class="fa-solid fa-clock-rotate-left"></i>
 
             </div>
 
             <span>
 
-                Registered Vehicles
+                Violation History
 
             </span>
 
@@ -366,17 +385,18 @@ QUICK ACTIONS
 
         <button
         class="action-card"
-        onclick="window.location.href='reports.html'">
+        type="button"
+        onclick="window.location.href='detection-result.html'">
 
             <div class="action-icon">
 
-                <i class="fa-solid fa-chart-column"></i>
+                <i class="fa-solid fa-square-poll-vertical"></i>
 
             </div>
 
             <span>
 
-                Reports
+                Detection Result
 
             </span>
 
@@ -400,8 +420,7 @@ RECENT DETECTIONS
 
         </h2>
 
-        <a
-        href="history.html">
+        <a href="history.html">
 
             View All
 
@@ -411,10 +430,7 @@ RECENT DETECTIONS
 
     </div>
 
-    <div
-    id="recentDetection">
-
-        <!-- Detection Card -->
+    <div id="recentDetection">
 
         <div class="detection-card">
 
@@ -522,11 +538,17 @@ class="modal">
         id="notificationList"
         class="modal-message">
 
-            <p>
+            <div class="notification-item">
 
-                No new notifications.
+                <i class="fa-solid fa-circle-info"></i>
 
-            </p>
+                <span>
+
+                    No new notifications.
+
+                </span>
+
+            </div>
 
         </div>
 
@@ -534,6 +556,7 @@ class="modal">
 
             <button
             class="modal-btn modal-ok"
+            type="button"
             onclick="closeNotificationModal()">
 
                 Close
@@ -657,6 +680,7 @@ BOTTOM NAVIGATION
 </div>
 
 <script src="js/modal.js"></script>
+<script src="js/theme.js"></script>
 <script src="js/dashboard.js"></script>
 
 </body>

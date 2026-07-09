@@ -1,208 +1,242 @@
 // =========================================
-// PlateTrack Global Modal System
+// PLATETRACK GLOBAL MODAL
 // =========================================
 
-const globalModal =
-document.getElementById("globalModal");
+function getModalParts(){
 
-const modalIcon =
-document.getElementById("modalIcon");
-
-const modalTitle =
-document.getElementById("modalTitle");
-
-const modalMessage =
-document.getElementById("modalMessage");
-
-const modalButtons =
-document.getElementById("modalButtons");
-
-// =========================================
-// CLOSE MODAL
-// =========================================
-
-function closeModal(){
-
-    globalModal.style.display = "none";
+    return {
+        modal:document.getElementById("globalModal"),
+        icon:document.getElementById("modalIcon"),
+        title:document.getElementById("modalTitle"),
+        message:document.getElementById("modalMessage"),
+        buttons:document.getElementById("modalButtons")
+    };
 
 }
 
-// =========================================
-// SUCCESS MODAL
-// =========================================
+function openModal(){
 
-function showSuccess(title,message,callback=null){
+    const parts = getModalParts();
 
-    modalIcon.innerHTML = "✅";
+    if(!parts.modal){
+        return;
+    }
 
-    modalTitle.textContent = title;
+    parts.modal.classList.add("show");
 
-    modalMessage.innerHTML =
-    message.replace(/\n/g,"<br>");
+}
 
-    modalButtons.innerHTML = `
+function closeModal(){
 
-        <button
-        class="modal-btn modal-ok"
-        id="modalOkButton">
+    const parts = getModalParts();
 
-            OK
+    if(!parts.modal){
+        return;
+    }
 
+    parts.modal.classList.remove("show");
+
+}
+
+function setModalIcon(type){
+
+    const parts = getModalParts();
+
+    if(!parts.icon){
+        return;
+    }
+
+    parts.icon.className = "modal-icon " + type;
+
+    if(type === "success"){
+        parts.icon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+    }
+    else if(type === "error"){
+        parts.icon.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+    }
+    else if(type === "warning"){
+        parts.icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+    }
+    else{
+        parts.icon.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+    }
+
+}
+
+function showSuccess(title,message,callback = null,buttonText = "Continue"){
+
+    const parts = getModalParts();
+
+    if(!parts.modal || !parts.title || !parts.message || !parts.buttons){
+
+        alert(title + "\n\n" + message);
+
+        if(typeof callback === "function"){
+            callback();
+        }
+
+        return;
+
+    }
+
+    setModalIcon("success");
+
+    parts.title.textContent = title;
+    parts.message.innerHTML = String(message).replace(/\n/g,"<br>");
+
+    parts.buttons.innerHTML = `
+        <button class="modal-btn modal-ok" id="modalOkButton">
+            ${buttonText}
         </button>
-
     `;
 
-    globalModal.style.display = "flex";
+    openModal();
 
-    document
-    .getElementById("modalOkButton")
-    .onclick = function(){
+    document.getElementById("modalOkButton").onclick = function(){
 
         closeModal();
 
         if(typeof callback === "function"){
-
             callback();
-
         }
 
     };
 
 }
 
-// =========================================
-// ERROR MODAL
-// =========================================
+function showError(title,message,buttonText = "Try Again"){
 
-function showError(title,message){
+    const parts = getModalParts();
 
-    modalIcon.innerHTML = "❌";
+    if(!parts.modal || !parts.title || !parts.message || !parts.buttons){
+        alert(title + "\n\n" + message);
+        return;
+    }
 
-    modalTitle.textContent = title;
+    setModalIcon("error");
 
-    modalMessage.innerHTML =
-    message.replace(/\n/g,"<br>");
+    parts.title.textContent = title;
+    parts.message.innerHTML = String(message).replace(/\n/g,"<br>");
 
-    modalButtons.innerHTML = `
-
-        <button
-        class="modal-btn modal-ok"
-        onclick="closeModal()">
-
-            OK
-
+    parts.buttons.innerHTML = `
+        <button class="modal-btn modal-ok" onclick="closeModal()">
+            ${buttonText}
         </button>
-
     `;
 
-    globalModal.style.display = "flex";
+    openModal();
 
 }
 
-// =========================================
-// WARNING MODAL
-// =========================================
+function showWarning(title,message,buttonText = "OK"){
 
-function showWarning(title,message){
+    const parts = getModalParts();
 
-    modalIcon.innerHTML = "⚠️";
+    if(!parts.modal || !parts.title || !parts.message || !parts.buttons){
+        alert(title + "\n\n" + message);
+        return;
+    }
 
-    modalTitle.textContent = title;
+    setModalIcon("warning");
 
-    modalMessage.innerHTML =
-    message.replace(/\n/g,"<br>");
+    parts.title.textContent = title;
+    parts.message.innerHTML = String(message).replace(/\n/g,"<br>");
 
-    modalButtons.innerHTML = `
-
-        <button
-        class="modal-btn modal-ok"
-        onclick="closeModal()">
-
-            OK
-
+    parts.buttons.innerHTML = `
+        <button class="modal-btn modal-ok" onclick="closeModal()">
+            ${buttonText}
         </button>
-
     `;
 
-    globalModal.style.display = "flex";
+    openModal();
 
 }
 
-// =========================================
-// CONFIRM MODAL
-// =========================================
+function showInfo(title,message,buttonText = "Got it"){
 
-function showConfirm(title,message,onConfirm){
+    const parts = getModalParts();
 
-    modalIcon.innerHTML = "⚠️";
+    if(!parts.modal || !parts.title || !parts.message || !parts.buttons){
+        alert(title + "\n\n" + message);
+        return;
+    }
 
-    modalTitle.textContent = title;
+    setModalIcon("info");
 
-    modalMessage.innerHTML =
-    message.replace(/\n/g,"<br>");
+    parts.title.textContent = title;
+    parts.message.innerHTML = String(message).replace(/\n/g,"<br>");
 
-    modalButtons.innerHTML = `
-
-        <button
-        class="modal-btn modal-cancel"
-        onclick="closeModal()">
-
-            Cancel
-
+    parts.buttons.innerHTML = `
+        <button class="modal-btn modal-ok" onclick="closeModal()">
+            ${buttonText}
         </button>
-
-        <button
-        class="modal-btn modal-danger"
-        id="confirmButton">
-
-            Confirm
-
-        </button>
-
     `;
 
-    globalModal.style.display = "flex";
+    openModal();
 
-    document
-    .getElementById("confirmButton")
-    .onclick = function(){
+}
+
+function showConfirm(title,message,onConfirm,confirmText = "Confirm",cancelText = "Cancel"){
+
+    const parts = getModalParts();
+
+    if(!parts.modal || !parts.title || !parts.message || !parts.buttons){
+
+        const confirmed = confirm(title + "\n\n" + message);
+
+        if(confirmed && typeof onConfirm === "function"){
+            onConfirm();
+        }
+
+        return;
+
+    }
+
+    setModalIcon("warning");
+
+    parts.title.textContent = title;
+    parts.message.innerHTML = String(message).replace(/\n/g,"<br>");
+
+    parts.buttons.innerHTML = `
+        <button class="modal-btn modal-cancel" id="modalCancelButton">
+            ${cancelText}
+        </button>
+
+        <button class="modal-btn modal-danger" id="modalConfirmButton">
+            ${confirmText}
+        </button>
+    `;
+
+    openModal();
+
+    document.getElementById("modalCancelButton").onclick = closeModal;
+
+    document.getElementById("modalConfirmButton").onclick = function(){
 
         closeModal();
 
         if(typeof onConfirm === "function"){
-
             onConfirm();
-
         }
 
     };
 
 }
 
-// =========================================
-// CLOSE WHEN CLICKING OUTSIDE
-// =========================================
-
 window.addEventListener("click",function(e){
 
-    if(e.target===globalModal){
+    const modal = document.getElementById("globalModal");
 
+    if(modal && e.target === modal){
         closeModal();
-
     }
 
 });
 
-// =========================================
-// ESC KEY CLOSE
-// =========================================
-
 document.addEventListener("keydown",function(e){
 
-    if(e.key==="Escape" && globalModal.style.display==="flex"){
-
+    if(e.key === "Escape"){
         closeModal();
-
     }
 
 });

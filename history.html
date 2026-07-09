@@ -72,7 +72,7 @@ TOP BAR
 </header>
 
 <!-- ==========================================
-SEARCH BAR
+SEARCH
 ========================================== -->
 
 <section class="search-section">
@@ -179,7 +179,7 @@ HISTORY LIST
 id="historyList"
 class="history-list">
 
-    <!-- History Cards will appear here -->
+    <!-- History cards will appear here -->
 
 </section>
 
@@ -283,6 +283,7 @@ class="details-modal">
 
             <button
             class="close-details"
+            type="button"
             onclick="closeDetailsModal()">
 
                 <i class="fa-solid fa-xmark"></i>
@@ -293,7 +294,33 @@ class="details-modal">
 
         <div class="details-content">
 
-            <div class="detail-item">
+            <div class="evidence-section">
+
+                <div class="evidence-title">
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    Captured Vehicle Evidence
+
+                </div>
+
+                <div
+                class="captured-detail-image"
+                id="capturedDetailImage">
+
+                    <div class="no-image-box">
+
+                        <i class="fa-solid fa-camera"></i>
+
+                        <p>No captured image available</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+                        <div class="detail-item">
 
                 <span>Record ID</span>
 
@@ -363,6 +390,7 @@ class="details-modal">
 
             <button
             class="close-modal-btn"
+            type="button"
             onclick="closeDetailsModal()">
 
                 Close
@@ -385,41 +413,20 @@ class="modal">
 
     <div class="modal-box">
 
-        <div
-        id="modalIcon"
-        class="modal-icon">
+        <div id="modalIcon" class="modal-icon">✅</div>
 
-            ✅
+        <div id="modalTitle" class="modal-title">Success</div>
 
-        </div>
+        <div id="modalMessage" class="modal-message">Message</div>
 
-        <div
-        id="modalTitle"
-        class="modal-title">
-
-            Success
-
-        </div>
-
-        <div
-        id="modalMessage"
-        class="modal-message">
-
-            Message
-
-        </div>
-
-        <div
-        id="modalButtons"
-        class="modal-buttons">
-
-        </div>
+        <div id="modalButtons" class="modal-buttons"></div>
 
     </div>
 
 </div>
 
 <script src="js/modal.js"></script>
+<script src="js/theme.js"></script>
 <script src="js/history.js"></script>
 
 </body>

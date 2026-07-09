@@ -1,0 +1,47 @@
+/* ==========================================
+   PLATETRACK GLOBAL THEME
+========================================== */
+
+:root{
+
+    --bg:#07111f;
+    --card:#111e35;
+    --card2:#0f1d33;
+
+    --text:#ffffff;
+    --text2:#dce7ff;
+    --text3:#9fb2d8;
+
+    --primary:#3d6cff;
+    --primary2:#6fa8ff;
+
+    --border:rgba(255,255,255,.08);
+
+}
+
+/* ==========================================
+   LIGHT MODE
+========================================== */
+
+body.light-mode{
+
+    --bg:#eef3fb;
+
+    --card:#ffffff;
+
+    --card2:#f7f9fc;
+
+    --text:#111827;
+
+    --text2:#334155;
+
+    --text3:#64748b;
+
+    --primary:#3d6cff;
+
+    --primary2:#6fa8ff;
+
+    --border:rgba(15,23,42,.08);
+
+}
+

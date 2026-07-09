@@ -1,406 +1,238 @@
-// ======================================
-// OFFICER PROFILE
-// ======================================
+// ==========================================
+// PLATETRACK PROFILE
+// ==========================================
 
-let profile =
-JSON.parse(localStorage.getItem("officerProfile")) || {
-
-    name: "Juan Dela Cruz",
-
-    badge: "TP-2026-001",
-
-    station: "Antipolo Traffic Office",
-
+const defaultProfile = {
+    officerName: "Juan Dela Cruz",
+    badgeNumber: "ATC-2026-014",
+    email: "officer@platetrack.com",
     contact: "09123456789",
-
-    email: "officer@platetrack.com"
-
+    assignedArea: "Antipolo City",
+    station: "Antipolo Traffic Management Office",
+    joinedDate: "Joined 2026"
 };
 
+function getSavedProfile(){
 
-// ======================================
-// DEFAULT PASSWORD
-// ======================================
+    try{
 
-if(!localStorage.getItem("officerPassword")){
+        const savedProfile =
+        JSON.parse(localStorage.getItem("plateTrackProfile"));
+
+        return {
+            ...defaultProfile,
+            ...(savedProfile || {})
+        };
+
+    }
+    catch(error){
+
+        localStorage.removeItem("plateTrackProfile");
+        return defaultProfile;
+
+    }
+
+}
+
+function setText(id,value){
+
+    const element = document.getElementById(id);
+
+    if(element){
+        element.textContent = value;
+    }
+
+}
+
+function getInputValue(id){
+
+    const element = document.getElementById(id);
+
+    return element ? element.value.trim() : "";
+
+}
+
+function saveProfileData(profile){
 
     localStorage.setItem(
-
-        "officerPassword",
-
-        "12345678"
-
+        "plateTrackProfile",
+        JSON.stringify(profile)
     );
 
 }
 
-
-// ======================================
-// LOAD PROFILE
-// ======================================
-
 function loadProfile(){
 
-    document.getElementById("officerName").textContent =
-    profile.name;
+    const profile = getSavedProfile();
 
-    document.getElementById("badgeNumber").textContent =
-    profile.badge;
-
-    document.getElementById("station").textContent =
-    profile.station;
-
-    document.getElementById("contact").textContent =
-    profile.contact;
-
-    document.getElementById("email").textContent =
-    profile.email;
+    setText("officerName",profile.officerName);
+    setText("badgeNumber","Badge No. " + profile.badgeNumber);
+    setText("emailText",profile.email);
+    setText("contactText",profile.contact);
+    setText("areaText",profile.assignedArea);
+    setText("joinedDate",profile.joinedDate);
 
 }
-
-loadProfile();
-
-
-// ======================================
-// EDIT PROFILE
-// ======================================
 
 function openEditModal(){
 
-    document.getElementById("editModal").style.display =
-    "flex";
+    const profile = getSavedProfile();
 
-    document.getElementById("editName").value =
-    profile.name;
+    const email = document.getElementById("editEmail");
+    const contact = document.getElementById("editContact");
+    const area = document.getElementById("editArea");
+    const modal = document.getElementById("editModal");
 
-    document.getElementById("editBadge").value =
-    profile.badge;
+    if(email){
+        email.value = profile.email;
+    }
 
-    document.getElementById("editStation").value =
-    profile.station;
+    if(contact){
+        contact.value = profile.contact;
+    }
 
-    document.getElementById("editContact").value =
-    profile.contact;
+    if(area){
+        area.value = profile.assignedArea;
+    }
 
-    document.getElementById("editEmail").value =
-    profile.email;
+    if(modal){
+        modal.classList.add("show");
+    }
 
 }
-
 
 function closeEditModal(){
 
-    document.getElementById("editModal").style.display =
-    "none";
+    const modal = document.getElementById("editModal");
+
+    if(modal){
+        modal.classList.remove("show");
+    }
 
 }
 
-
-// ======================================
-// SAVE PROFILE
-// ======================================
-
 function saveProfile(){
 
-    const station =
-    document.getElementById("editStation")
-    .value.trim();
+    const email = getInputValue("editEmail");
+    const contact = getInputValue("editContact");
+    const assignedArea = getInputValue("editArea");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const contact =
-    document.getElementById("editContact")
-    .value.trim();
-
-    const email =
-    document.getElementById("editEmail")
-    .value.trim();
-
-
-    if(station===""){
+    if(email === "" || contact === "" || assignedArea === ""){
 
         showError(
-
-            "Station Required",
-
-            "Please enter your station."
-
+            "Incomplete Profile",
+            "Please complete your email, contact number, and assigned area."
         );
 
         return;
 
     }
 
-
-    if(contact===""){
+    if(!emailPattern.test(email)){
 
         showError(
-
-            "Contact Number Required",
-
-            "Please enter your contact number."
-
+            "Invalid Email",
+            "Please enter a valid email address."
         );
 
         return;
 
     }
-
 
     if(!/^09\d{9}$/.test(contact)){
 
         showError(
-
             "Invalid Contact Number",
-
-            "Contact number must start with 09 and contain 11 digits."
-
+            "Please enter a valid 11-digit Philippine mobile number."
         );
 
         return;
 
     }
 
+    const profile = {
+        ...getSavedProfile(),
+        email,
+        contact,
+        assignedArea
+    };
 
-    if(email===""){
-
-        showError(
-
-            "Email Required",
-
-            "Please enter your email address."
-
-        );
-
-        return;
-
-    }
-
-
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-
-        showError(
-
-            "Invalid Email",
-
-            "Please enter a valid email address."
-
-        );
-
-        return;
-
-    }
-
-
-    profile.station = station;
-
-    profile.contact = contact;
-
-    profile.email = email;
-
-
-    localStorage.setItem(
-
-        "officerProfile",
-
-        JSON.stringify(profile)
-
-    );
-
-
+    saveProfileData(profile);
     loadProfile();
-
     closeEditModal();
 
-
     showSuccess(
-
         "Profile Updated",
-
-        "Officer profile updated successfully."
-
+        "Your profile information has been updated successfully."
     );
 
 }
 
-// ======================================
-// PASSWORD MODAL
-// ======================================
-
 function openPasswordModal(){
 
-    document.getElementById("passwordModal").style.display =
-    "flex";
+    ["currentPassword","newPassword","confirmPassword"].forEach(function(id){
 
-    document.getElementById("currentPassword").value = "";
+        const input = document.getElementById(id);
 
-    document.getElementById("newPassword").value = "";
+        if(input){
+            input.value = "";
+        }
 
-    document.getElementById("confirmPassword").value = "";
+    });
 
-    document.getElementById("passwordMessage").textContent = "";
+    const modal = document.getElementById("passwordModal");
 
-    document.getElementById("strengthFill").style.width = "0%";
-
-    document.getElementById("strengthFill").style.background =
-    "#dc3545";
-
-    document.getElementById("strengthText").textContent =
-    "Password Strength";
+    if(modal){
+        modal.classList.add("show");
+    }
 
 }
 
 function closePasswordModal(){
 
-    document.getElementById("passwordModal").style.display =
-    "none";
+    const modal = document.getElementById("passwordModal");
 
-}
-
-
-// ======================================
-// PASSWORD STRENGTH
-// ======================================
-
-function checkPasswordStrength(){
-
-    const password =
-    document.getElementById("newPassword").value;
-
-    const bar =
-    document.getElementById("strengthFill");
-
-    const text =
-    document.getElementById("strengthText");
-
-    let score = 0;
-
-    if(password.length >= 8) score++;
-
-    if(/[A-Z]/.test(password)) score++;
-
-    if(/[a-z]/.test(password)) score++;
-
-    if(/[0-9]/.test(password)) score++;
-
-    if(/[^A-Za-z0-9]/.test(password)) score++;
-
-    if(score <= 2){
-
-        bar.style.width = "35%";
-        bar.style.background = "#ef4444";
-        text.textContent = "Weak Password";
-
-    }
-
-    else if(score <= 4){
-
-        bar.style.width = "70%";
-        bar.style.background = "#f59e0b";
-        text.textContent = "Medium Password";
-
-    }
-
-    else{
-
-        bar.style.width = "100%";
-        bar.style.background = "#22c55e";
-        text.textContent = "Strong Password";
-
+    if(modal){
+        modal.classList.remove("show");
     }
 
 }
 
+function isStrongPassword(password){
 
-// ======================================
-// SHOW / HIDE PASSWORD
-// ======================================
-
-function togglePassword(id, icon){
-
-    const input =
-    document.getElementById(id);
-
-    if(input.type === "password"){
-
-        input.type = "text";
-
-        icon.textContent = "🙈";
-
-    }
-
-    else{
-
-        input.type = "password";
-
-        icon.textContent = "👁";
-
-    }
+    return (
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /\d/.test(password)
+    );
 
 }
-
-
-// ======================================
-// SAVE PASSWORD
-// ======================================
 
 function savePassword(){
 
-    const current =
-    document.getElementById("currentPassword").value;
+    const currentPassword = getInputValue("currentPassword");
+    const newPassword = getInputValue("newPassword");
+    const confirmPassword = getInputValue("confirmPassword");
 
-    const newPassword =
-    document.getElementById("newPassword").value;
+    if(currentPassword === "" || newPassword === "" || confirmPassword === ""){
 
-    const confirmPassword =
-    document.getElementById("confirmPassword").value;
-
-    const message =
-    document.getElementById("passwordMessage");
-
-    const savedPassword =
-    localStorage.getItem("officerPassword");
-
-    message.style.color = "#ff6b6b";
-
-    if(current === ""){
-
-        message.textContent =
-        "Current password is required.";
+        showError(
+            "Incomplete Password",
+            "Please complete all password fields."
+        );
 
         return;
 
     }
 
-    if(current !== savedPassword){
+    if(!isStrongPassword(newPassword)){
 
-        message.textContent =
-        "Current password is incorrect.";
-
-        return;
-
-    }
-
-    if(newPassword.length < 8){
-
-        message.textContent =
-        "Password must be at least 8 characters.";
-
-        return;
-
-    }
-
-    if(!/[A-Z]/.test(newPassword)){
-
-        message.textContent =
-        "Password must contain at least one uppercase letter.";
-
-        return;
-
-    }
-
-    if(!/[0-9]/.test(newPassword)){
-
-        message.textContent =
-        "Password must contain at least one number.";
+        showError(
+            "Weak Password",
+            "Please use at least 8 characters with uppercase, lowercase, and a number."
+        );
 
         return;
 
@@ -408,65 +240,60 @@ function savePassword(){
 
     if(newPassword !== confirmPassword){
 
-        message.textContent =
-        "Passwords do not match.";
+        showError(
+            "Password Mismatch",
+            "The new password and confirmation password do not match."
+        );
 
         return;
 
     }
-
-    if(newPassword === current){
-
-        message.textContent =
-        "New password must be different.";
-
-        return;
-
-    }
-
-    localStorage.setItem(
-
-        "officerPassword",
-
-        newPassword
-
-    );
 
     closePasswordModal();
 
     showSuccess(
-
         "Password Updated",
-
-        "Your password has been changed successfully."
-
+        "Password changing will be connected to the backend in the final version."
     );
 
 }
 
+function aboutPlateTrack(){
 
-// ======================================
-// CLOSE MODALS
-// ======================================
+    showInfo(
+        "About PlateTrack",
+        "PlateTrack is a mobile machine learning-based license plate recognition system for automated traffic violation monitoring of private four-wheel vehicles in Antipolo City.",
+        "OK"
+    );
 
-window.onclick = function(event){
+}
 
-    const editModal =
-    document.getElementById("editModal");
+function closeProfileModals(event){
 
-    const passwordModal =
-    document.getElementById("passwordModal");
+    ["editModal","passwordModal"].forEach(function(id){
 
-    if(event.target === editModal){
+        const modal = document.getElementById(id);
 
-        closeEditModal();
+        if(modal && event.target === modal){
+            modal.classList.remove("show");
+        }
 
-    }
+    });
 
-    if(event.target === passwordModal){
+}
 
-        closePasswordModal();
+document.addEventListener("DOMContentLoaded",function(){
 
-    }
+    loadProfile();
 
-};
+    window.addEventListener("click",closeProfileModals);
+
+});
+
+window.openEditModal = openEditModal;
+window.closeEditModal = closeEditModal;
+window.saveProfile = saveProfile;
+window.openPasswordModal = openPasswordModal;
+window.closePasswordModal = closePasswordModal;
+window.savePassword = savePassword;
+window.aboutPlateTrack = aboutPlateTrack;

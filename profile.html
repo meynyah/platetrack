@@ -5,63 +5,117 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
+<meta
+name="viewport"
 content="width=device-width, initial-scale=1.0">
 
 <title>PlateTrack | Officer Profile</title>
 
-<link rel="preconnect"
+<link
+rel="preconnect"
 href="https://fonts.googleapis.com">
 
-<link rel="preconnect"
+<link
+rel="preconnect"
 href="https://fonts.gstatic.com"
 crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
 rel="stylesheet">
 
-<link rel="stylesheet"
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link
+rel="stylesheet"
 href="css/modal.css">
 
-<link rel="stylesheet"
+<link
+rel="stylesheet"
 href="css/profile.css">
 
 </head>
 
 <body>
 
+<div class="background-grid"></div>
+
 <div class="container">
 
-<div class="profile-card">
+<!-- ==========================
+TOP BAR
+========================== -->
 
-<!-- PROFILE HEADER -->
+<header class="topbar">
 
-<div class="profile-header">
+<button
+class="menu-btn"
+onclick="window.location.href='enforcer-dashboard.html'">
 
-<div class="avatar">
+<i class="fa-solid fa-arrow-left"></i>
 
-👮
+</button>
+
+<div class="logo">
+
+Profile
 
 </div>
 
-<h1 id="officerName">
+<div class="topbar-space"></div>
+
+</header>
+
+<!-- ==========================
+PROFILE HEADER
+========================== -->
+
+<section class="profile-header">
+
+<div class="avatar">
+
+<i class="fa-solid fa-user-shield"></i>
+
+</div>
+
+<div class="profile-info">
+
+<h1
+id="officerName">
 
 Juan Dela Cruz
 
 </h1>
 
-<p class="role">
+<p class="officer-role">
 
 Traffic Enforcer
 
 </p>
 
-<div class="badge">
+<div
+class="badge-number"
+id="badgeNumber">
 
-🆔
-<span id="badgeNumber">
+Badge No. ATC-2026-014
 
-TP-2026-001
+</div>
+
+<div class="profile-status">
+
+<span class="status">
+
+🟢 Active Duty
+
+</span>
+
+<span
+class="joined-date"
+id="joinedDate">
+
+Joined 2026
 
 </span>
 
@@ -69,359 +123,533 @@ TP-2026-001
 
 </div>
 
-<!-- OFFICER INFORMATION -->
+</section>
 
-<div class="info-card">
+<!-- ==========================
+PERSONAL INFORMATION
+========================== -->
+
+<section class="profile-card">
+
+<div class="section-header">
 
 <h2>
 
-Officer Information
+Personal Information
 
 </h2>
 
-<div class="info-row">
+</div>
 
-<div class="info-left">
+<div class="info-list">
 
-🏢 Station
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-envelope"></i>
 
 </div>
 
-<div
-class="info-right"
-id="station">
+<div class="info-content">
 
-Antipolo Traffic Office
+<span>
 
-</div>
+Email Address
 
-</div>
+</span>
 
-<div class="divider"></div>
-
-<div class="info-row">
-
-<div class="info-left">
-
-📞 Contact Number
-
-</div>
-
-<div
-class="info-right"
-id="contact">
-
-09123456789
-
-</div>
-
-</div>
-
-<div class="divider"></div>
-
-<div class="info-row">
-
-<div class="info-left">
-
-📧 Email Address
-
-</div>
-
-<div
-class="info-right"
-id="email">
+<strong
+id="emailText">
 
 officer@platetrack.com
 
+</strong>
+
+</div>
+
+</div>
+
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-phone"></i>
+
+</div>
+
+<div class="info-content">
+
+<span>
+
+Contact Number
+
+</span>
+
+<strong
+id="contactText">
+
+09123456789
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-location-dot"></i>
+
+</div>
+
+<div class="info-content">
+
+<span>
+
+Assigned Area
+
+</span>
+
+<strong
+id="areaText">
+
+Antipolo City
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-building"></i>
+
+</div>
+
+<div class="info-content">
+
+<span>
+
+Station
+
+</span>
+
+<strong>
+
+Antipolo Traffic Management Office
+
+</strong>
+
 </div>
 
 </div>
 
 </div>
 
-<!-- ACTION BUTTONS -->
+</section>
 
-<div class="buttons">
+<!-- ==========================
+ACCOUNT
+========================== -->
+
+<section class="profile-card">
+
+<div class="section-header">
+
+<h2>
+
+Account
+
+</h2>
+
+</div>
+
+<div class="settings-list">
 
 <button
-class="edit-btn"
+class="setting-item"
 onclick="openEditModal()">
 
-✏ Edit Profile
+<div class="setting-left">
+
+<div class="setting-icon">
+
+<i class="fa-solid fa-user-pen"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+Edit Profile
+
+</h3>
+
+<p>
+
+Update your email, contact number and assigned area.
+
+</p>
+
+</div>
+
+</div>
+
+<i class="fa-solid fa-chevron-right"></i>
 
 </button>
 
 <button
-class="password-btn"
+class="setting-item"
 onclick="openPasswordModal()">
 
-🔒 Change Password
+<div class="setting-left">
+
+<div class="setting-icon">
+
+<i class="fa-solid fa-lock"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+Change Password
+
+</h3>
+
+<p>
+
+Secure your PlateTrack account.
+
+</p>
+
+</div>
+
+</div>
+
+<i class="fa-solid fa-chevron-right"></i>
 
 </button>
 
 <button
-class="back-btn"
-onclick="window.location.href='enforcer-dashboard.html'">
+class="setting-item"
+onclick="aboutPlateTrack()">
 
-← Back to Dashboard
+<div class="setting-left">
+
+<div class="setting-icon">
+
+<i class="fa-solid fa-circle-info"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+About PlateTrack
+
+</h3>
+
+<p>
+
+Application information and version.
+
+</p>
+
+</div>
+
+</div>
+
+<i class="fa-solid fa-chevron-right"></i>
 
 </button>
 
 </div>
 
+</section>
+
+<!-- ==========================
+SYSTEM INFORMATION
+========================== -->
+
+<section class="profile-card">
+
+<div class="section-header">
+
+<h2>
+
+System Information
+
+</h2>
+
+</div>
+
+<div class="info-list">
+
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-mobile-screen-button"></i>
+
+</div>
+
+<div class="info-content">
+
+<span>
+
+Application
+
+</span>
+
+<strong>
+
+PlateTrack Mobile
+
+</strong>
+
 </div>
 
 </div>
+
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-code-branch"></i>
+
+</div>
+
+<div class="info-content">
+
+<span>
+
+Version
+
+</span>
+
+<strong>
+
+Version 1.0.0
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="info-item">
+
+<div class="info-icon">
+
+<i class="fa-solid fa-calendar-check"></i>
+
+</div>
+
+<div class="info-content">
+
+<span>
+
+Last Updated
+
+</span>
+
+<strong>
+
+July 2026
+
+</strong>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
 
 <!-- ==========================
 EDIT PROFILE MODAL
-=========================== -->
+========================== -->
 
 <div
 id="editModal"
 class="modal">
 
-<div class="modal-content">
+    <div class="modal-box">
 
-<span
-class="close"
-onclick="closeEditModal()">
+        <div class="modal-header">
 
-&times;
+            <h2>
 
-</span>
+                Edit Profile
 
-<h2>
+            </h2>
 
-✏ Edit Profile
+            <button
+            class="close-btn"
+            onclick="closeEditModal()">
 
-</h2>
+                <i class="fa-solid fa-xmark"></i>
 
-<div class="input-group">
+            </button>
 
-<label>
+        </div>
 
-Officer Name
+        <div class="modal-content">
 
-</label>
+            <div class="input-group">
 
-<input
-type="text"
-id="editName"
-readonly>
+                <label>
 
-</div>
+                    Email Address
 
-<div class="input-group">
+                </label>
 
-<label>
+                <input
+                type="email"
+                id="editEmail">
 
-Badge Number
+            </div>
 
-</label>
+            <div class="input-group">
 
-<input
-type="text"
-id="editBadge"
-readonly>
+                <label>
 
-</div>
+                    Contact Number
 
-<div class="input-group">
+                </label>
 
-<label>
+                <input
+                type="text"
+                id="editContact">
 
-Station
+            </div>
 
-</label>
+            <div class="input-group">
 
-<input
-type="text"
-id="editStation">
+                <label>
 
-</div>
+                    Assigned Area
 
-<div class="input-group">
+                </label>
 
-<label>
+                <input
+                type="text"
+                id="editArea">
 
-Contact Number
+            </div>
 
-</label>
+        </div>
 
-<input
-type="text"
-id="editContact">
+        <div class="modal-buttons">
 
-</div>
+            <button
+            class="cancel-btn"
+            onclick="closeEditModal()">
 
-<div class="input-group">
+                Cancel
 
-<label>
+            </button>
 
-Email Address
+            <button
+            class="save-btn"
+            onclick="saveProfile()">
 
-</label>
+                Save Changes
 
-<input
-type="email"
-id="editEmail">
+            </button>
 
-</div>
+        </div>
 
-<div class="modal-buttons">
-
-<button
-class="cancel-btn"
-onclick="closeEditModal()">
-
-Cancel
-
-</button>
-
-<button
-class="save-btn"
-onclick="saveProfile()">
-
-💾 Save Changes
-
-</button>
+    </div>
 
 </div>
 
-</div>
-
-</div>
-
-<!-- ======================================
+<!-- ==========================
 CHANGE PASSWORD MODAL
-====================================== -->
+========================== -->
 
 <div
 id="passwordModal"
 class="modal">
 
-    <div class="modal-content">
+    <div class="modal-box">
 
-        <span
-        class="close"
-        onclick="closePasswordModal()">
+        <div class="modal-header">
 
-            &times;
+            <h2>
 
-        </span>
+                Change Password
 
-        <h2>
+            </h2>
 
-            🔒 Change Password
+            <button
+            class="close-btn"
+            onclick="closePasswordModal()">
 
-        </h2>
+                <i class="fa-solid fa-xmark"></i>
 
-        <div class="input-group">
+            </button>
 
-            <label>
+        </div>
 
-                Current Password
+        <div class="modal-content">
 
-            </label>
+            <div class="input-group">
 
-            <div class="password-box">
+                <label>
+
+                    Current Password
+
+                </label>
 
                 <input
                 type="password"
                 id="currentPassword"
                 placeholder="Enter current password">
 
-                <span
-                class="toggle-password"
-                onclick="togglePassword('currentPassword', this)">
-
-                    👁
-
-                </span>
-
             </div>
 
-        </div>
+            <div class="input-group">
 
-        <div class="input-group">
+                <label>
 
-            <label>
+                    New Password
 
-                New Password
-
-            </label>
-
-            <div class="password-box">
+                </label>
 
                 <input
                 type="password"
                 id="newPassword"
-                placeholder="Enter new password"
-                oninput="checkPasswordStrength()">
-
-                <span
-                class="toggle-password"
-                onclick="togglePassword('newPassword', this)">
-
-                    👁
-
-                </span>
+                placeholder="Enter new password">
 
             </div>
 
-        </div>
+            <div class="input-group">
 
-        <div class="strength">
+                <label>
 
-            <div class="strength-bar">
+                    Confirm Password
 
-                <div
-                id="strengthFill">
-
-                </div>
-
-            </div>
-
-            <small
-            id="strengthText">
-
-                Password Strength
-
-            </small>
-
-        </div>
-
-        <div class="input-group">
-
-            <label>
-
-                Confirm Password
-
-            </label>
-
-            <div class="password-box">
+                </label>
 
                 <input
                 type="password"
                 id="confirmPassword"
-                placeholder="Confirm password">
-
-                <span
-                class="toggle-password"
-                onclick="togglePassword('confirmPassword', this)">
-
-                    👁
-
-                </span>
+                placeholder="Confirm new password">
 
             </div>
-
-        </div>
-
-        <div
-        id="passwordMessage"
-        class="password-message">
 
         </div>
 
@@ -439,7 +667,7 @@ class="modal">
             class="save-btn"
             onclick="savePassword()">
 
-                🔒 Change Password
+                Update Password
 
             </button>
 
@@ -449,10 +677,9 @@ class="modal">
 
 </div>
 
-
-<!-- ======================================
+<!-- ==========================
 GLOBAL MODAL
-====================================== -->
+========================== -->
 
 <div
 id="globalModal"
@@ -464,25 +691,25 @@ class="modal">
         id="modalIcon"
         class="modal-icon">
 
-            ✅
+            <i class="fa-solid fa-circle-check"></i>
 
         </div>
 
-        <h2
+        <div
         id="modalTitle"
         class="modal-title">
 
             Success
 
-        </h2>
+        </div>
 
-        <p
+        <div
         id="modalMessage"
         class="modal-message">
 
             Message
 
-        </p>
+        </div>
 
         <div
         id="modalButtons"
@@ -494,11 +721,75 @@ class="modal">
 
 </div>
 
+<!-- ==========================
+BOTTOM NAVIGATION
+========================== -->
+
+<nav class="bottom-nav">
+
+    <a
+    href="enforcer-dashboard.html"
+    class="nav-item">
+
+        <i class="fa-solid fa-house"></i>
+
+        <span>
+
+            Home
+
+        </span>
+
+    </a>
+
+    <a
+    href="camera.html"
+    class="nav-item">
+
+        <i class="fa-solid fa-camera"></i>
+
+        <span>
+
+            Detect
+
+        </span>
+
+    </a>
+
+    <a
+    href="history.html"
+    class="nav-item">
+
+        <i class="fa-solid fa-clock-rotate-left"></i>
+
+        <span>
+
+            History
+
+        </span>
+
+    </a>
+
+    <a
+    href="profile.html"
+    class="nav-item active">
+
+        <i class="fa-solid fa-user"></i>
+
+        <span>
+
+            Profile
+
+        </span>
+
+    </a>
+
+</nav>
+
+</div>
 
 <script src="js/modal.js"></script>
-
+<script src="js/theme.js"></script>
 <script src="js/profile.js"></script>
 
 </body>
-
 </html>

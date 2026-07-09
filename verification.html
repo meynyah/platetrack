@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,9 +13,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <link rel="stylesheet" href="css/verification.css">
     <link rel="stylesheet" href="css/modal.css">
@@ -27,89 +24,100 @@
 
     <div class="background-grid"></div>
 
-    <div class="login-wrapper">
+    <main class="login-wrapper">
 
-        <div class="login-card">
+        <section class="login-card">
+
+            <!-- LOGO AREA -->
 
             <div class="logo-area">
 
                 <div class="logo-box">
-
-                    🛡️
-
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
 
                 <h1>PlateTrack</h1>
 
                 <span class="badge">
-
                     ANTIPOLO CITY LGU
-
                 </span>
 
                 <p class="portal">
-
                     Email Verification
-
                 </p>
 
             </div>
+
+            <!-- WELCOME TEXT -->
 
             <div class="welcome">
 
-                <h2>Verification Code</h2>
+                <h2>Verify Your Identity</h2>
 
                 <p>
-
-                    We've sent a <strong>6-digit verification code</strong>
-                    to your registered email address.
-
+                    We sent a <strong>6-digit verification code</strong> to
                 </p>
+
+                <div class="masked-email" id="maskedEmail">
+                    officer@platetrack.gov.ph
+                </div>
 
             </div>
 
+            <!-- VERIFICATION FORM -->
+
             <form id="verificationForm" autocomplete="off">
 
-                <div class="verification-box">
+                <div class="verification-box" id="verificationBox">
 
                     <input
                         type="text"
+                        inputmode="numeric"
                         maxlength="1"
-                        class="code-input">
+                        class="code-input"
+                        aria-label="Digit 1">
 
                     <input
                         type="text"
+                        inputmode="numeric"
                         maxlength="1"
-                        class="code-input">
+                        class="code-input"
+                        aria-label="Digit 2">
 
                     <input
                         type="text"
+                        inputmode="numeric"
                         maxlength="1"
-                        class="code-input">
+                        class="code-input"
+                        aria-label="Digit 3">
 
                     <input
                         type="text"
+                        inputmode="numeric"
                         maxlength="1"
-                        class="code-input">
+                        class="code-input"
+                        aria-label="Digit 4">
 
                     <input
                         type="text"
+                        inputmode="numeric"
                         maxlength="1"
-                        class="code-input">
+                        class="code-input"
+                        aria-label="Digit 5">
 
                     <input
                         type="text"
+                        inputmode="numeric"
                         maxlength="1"
-                        class="code-input">
+                        class="code-input"
+                        aria-label="Digit 6">
 
                 </div>
 
                 <div class="resend">
 
                     <span>
-
                         Didn't receive the code?
-
                     </span>
 
                     <button
@@ -123,9 +131,9 @@
                 </div>
 
                 <button
-                    type="button"
+                    type="submit"
                     id="verifyBtn"
-                    class="login-btn">
+                    class="verify-btn">
 
                     Verify Code
 
@@ -133,35 +141,35 @@
 
             </form>
 
+            <!-- BACK LINK -->
+
             <div class="back-link">
 
                 <a href="forgot-password.html">
-
-                    ← Back
-
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Forgot Password
                 </a>
 
             </div>
 
+            <!-- FOOTER -->
+
             <div class="footer">
 
                 <span>
-
-                    🔒 Secure Verification
-
+                    <i class="fa-solid fa-lock"></i>
+                    Secure Verification
                 </span>
 
                 <small>
-
                     Developed for Antipolo City LGU
-
                 </small>
 
             </div>
 
-        </div>
+        </section>
 
-    </div>
+    </main>
 
     <!-- GLOBAL MODAL -->
 
@@ -173,7 +181,7 @@
                 id="modalIcon"
                 class="modal-icon">
 
-                ✅
+                <i class="fa-solid fa-circle-check"></i>
 
             </div>
 
@@ -209,4 +217,3 @@
 </body>
 
 </html>
-```

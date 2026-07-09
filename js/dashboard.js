@@ -1,281 +1,244 @@
 // ==========================================
+// LOAD SAVED THEME
+// ==========================================
+
+// ==========================================
 // PLATETRACK DASHBOARD
 // ==========================================
 
+document.addEventListener("DOMContentLoaded",function(){
 
-// ==========================================
-// LIVE DATE & TIME
-// ==========================================
+    updateDateTime();
+    updateGreeting();
+    loadDashboardData();
+    loadRecentDetections();
+
+    setInterval(updateDateTime,1000);
+
+});
+
+function getViolationRecords(){
+
+    const data = localStorage.getItem("plateTrackHistory");
+
+    if(!data){
+        return [];
+    }
+
+    return JSON.parse(data);
+
+}
 
 function updateDateTime(){
 
     const now = new Date();
 
-    const dateOptions = {
-
+    document.getElementById("todayDate").textContent =
+    now.toLocaleDateString("en-US",{
         year:"numeric",
         month:"long",
         day:"numeric"
-
-    };
-
-    const timeOptions = {
-
-        hour:"numeric",
-        minute:"2-digit",
-        second:"2-digit"
-
-    };
-
-    document.getElementById("todayDate").textContent =
-    now.toLocaleDateString("en-US",dateOptions);
+    });
 
     document.getElementById("liveTime").textContent =
-    now.toLocaleTimeString("en-US",timeOptions);
+    now.toLocaleTimeString("en-US",{
+        hour:"numeric",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true
+    });
 
 }
-
-setInterval(updateDateTime,1000);
-
-updateDateTime();
-
-
-// ==========================================
-// GREETING
-// ==========================================
 
 function updateGreeting(){
 
     const hour = new Date().getHours();
-
-    const greeting =
-    document.getElementById("greeting");
+    const greeting = document.getElementById("greeting");
 
     if(hour < 12){
-
-        greeting.innerHTML =
-        "Good Morning ☀️";
-
+        greeting.innerHTML = "Good Morning ☀️";
     }
-
     else if(hour < 18){
-
-        greeting.innerHTML =
-        "Good Afternoon 🌤";
-
+        greeting.innerHTML = "Good Afternoon 🌤";
     }
-
     else{
-
-        greeting.innerHTML =
-        "Good Evening 🌙";
-
+        greeting.innerHTML = "Good Evening 🌙";
     }
 
 }
 
-updateGreeting();
-
-
-// ==========================================
-// HEADER MENU
-// ==========================================
-
 function toggleMenu(){
 
-    const menu =
-    document.getElementById("headerMenu");
+    const menu = document.getElementById("headerMenu");
 
-    if(menu.style.display==="block"){
-
-        menu.style.display="none";
-
-    }
-
-    else{
-
-        menu.style.display="block";
-
-    }
+    menu.style.display =
+    menu.style.display === "block" ? "none" : "block";
 
 }
 
 window.addEventListener("click",function(e){
 
-    if(
-        !e.target.closest(".menu-wrapper")
-    ){
+    if(!e.target.closest(".menu-wrapper")){
 
-        document
-        .getElementById("headerMenu")
-        .style.display="none";
+        const menu = document.getElementById("headerMenu");
+
+        if(menu){
+            menu.style.display = "none";
+        }
 
     }
 
 });
 
-// ==========================================
-// START DETECTION
-// ==========================================
-
 function startDetection(){
 
     showSuccess(
-
         "Opening Camera",
-
         "The camera will now open for license plate detection."
-
     );
 
     setTimeout(function(){
-
-        window.location.href="camera.html";
-
-    },1200);
+        window.location.href = "camera.html";
+    },1000);
 
 }
 
-
-// ==========================================
-// NOTIFICATION MODAL
-// ==========================================
-
 function openNotificationModal(){
 
-    document
-    .getElementById("notificationModal")
-    .style.display="flex";
+    document.getElementById("notificationModal").style.display = "flex";
 
 }
 
 function closeNotificationModal(){
 
-    document
-    .getElementById("notificationModal")
-    .style.display="none";
+    document.getElementById("notificationModal").style.display = "none";
 
 }
-
-
-// ==========================================
-// LOGOUT
-// ==========================================
 
 function confirmLogout(){
 
     showConfirm(
-
         "Logout",
-
         "Are you sure you want to logout?",
-
         function(){
-
-            window.location.href="enforcer-login.html";
-
+            window.location.href = "enforcer-login.html";
         }
-
     );
 
 }
 
-
-// ==========================================
-// SAMPLE DASHBOARD DATA
-// ==========================================
-
-const dashboardData={
-
-    vehicles:24,
-
-    violations:7,
-
-    pending:2,
-
-    notifications:3
-
-};
-
 function loadDashboardData(){
 
-    document.getElementById("vehicleCount").textContent=
-    dashboardData.vehicles;
+    const records = getViolationRecords();
+    const notificationsSetting =
+    localStorage.getItem("plateTrackNotifications");
 
-    document.getElementById("violationCount").textContent=
-    dashboardData.violations;
+    const preferences = {
+        notifications:
+        notificationsSetting === null ? true : notificationsSetting === "true"
+    };
 
-    document.getElementById("pendingReports").textContent=
-    dashboardData.pending;
+    document.getElementById("vehicleCount").textContent = records.length;
+    document.getElementById("violationCount").textContent = records.length;
+    document.getElementById("pendingReports").textContent = records.length;
 
-    const badge=
-    document.getElementById("notificationCount");
+    const notificationCount = document.getElementById("notificationCount");
+    const notificationList = document.getElementById("notificationList");
 
-    badge.textContent=
-    dashboardData.notifications;
+    if(!preferences.notifications){
 
-    if(dashboardData.notifications===0){
+        notificationCount.style.display = "none";
 
-        badge.style.display="none";
+        notificationList.innerHTML = `
+            <div class="notification-item">
+                <i class="fa-solid fa-bell-slash"></i>
+                <span>Notifications are turned off in Settings.</span>
+            </div>
+        `;
 
     }
+    else if(records.length === 0){
 
+        notificationCount.style.display = "none";
+
+        notificationList.innerHTML = `
+            <div class="notification-item">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>No new notifications.</span>
+            </div>
+        `;
+
+    }
     else{
 
-        badge.style.display="flex";
+        notificationCount.style.display = "flex";
+        notificationCount.textContent = records.length;
+
+        notificationList.innerHTML = `
+            <div class="notification-item">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>${records.length} violation record(s) saved in history.</span>
+            </div>
+        `;
 
     }
 
 }
 
-loadDashboardData();
+function loadRecentDetections(){
 
+    const container = document.getElementById("recentDetection");
+    const records = getViolationRecords();
 
-// ==========================================
-// CLOSE NOTIFICATION
-// ==========================================
+    container.innerHTML = "";
 
-window.addEventListener("click",function(e){
+    if(records.length === 0){
 
-    const modal=
-    document.getElementById("notificationModal");
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <h3>No Recent Detection</h3>
+                <p>No saved violation records found yet.</p>
+            </div>
+        `;
 
-    if(e.target===modal){
-
-        closeNotificationModal();
-
+        return;
     }
 
-});
+    const recent = records.slice(0,3);
 
+    recent.forEach(function(item){
 
-// ==========================================
-// PAGE ANIMATION
-// ==========================================
+        const plate = item.plateNumber || "Unknown Plate";
+        const vehicle = item.vehicleType || item.vehicleModel || "Unknown Vehicle";
+        const color = item.vehicleColor || "Unknown Color";
+        const violation = item.violation || item.violationType || "Violation Recorded";
+        const location = item.location || "Unknown Location";
+        const date = item.date || "Recent";
 
-window.addEventListener("load",function(){
+        container.innerHTML += `
+            <div class="detection-card">
 
-    document.body.style.opacity="0";
+                <div class="plate-icon">
+                    <i class="fa-solid fa-car"></i>
+                </div>
 
-    setTimeout(function(){
+                <div class="plate-details">
+                    <h3>${plate}</h3>
+                    <p>${vehicle} • ${color}</p>
+                    <small>${violation}</small>
+                    <small>${location}</small>
+                </div>
 
-        document.body.style.transition="opacity .35s ease";
+                <span class="time-badge">
+                    ${date}
+                </span>
 
-        document.body.style.opacity="1";
+            </div>
+        `;
 
-    },50);
+    });
 
-});
-
-
-// ==========================================
-// FUTURE DATABASE
-// ==========================================
-
-// TODO:
-// Load Officer Name
-// Load Badge Number
-// Load Today's Statistics
-// Load Recent Detections
-// Load Notifications
-// from Node.js + MongoDB
+}

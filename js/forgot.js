@@ -1,83 +1,113 @@
 // =========================================
-// PlateTrack - Forgot Password
+// PlateTrack | Forgot Password
 // =========================================
 
-const emailInput = document.getElementById("email");
-const sendCodeBtn = document.getElementById("sendCodeBtn");
+document.addEventListener("DOMContentLoaded", () => {
 
-sendCodeBtn.addEventListener("click", sendVerificationCode);
+    const form = document.getElementById("forgotPasswordForm");
+    const email = document.getElementById("email");
+    const button = document.getElementById("sendCodeButton");
 
-function sendVerificationCode(){
+    // ===============================
+    // Form Submit
+    // ===============================
 
-    const email = emailInput.value.trim();
+    form.addEventListener("submit", (e) => {
 
-    // Email Required
+        e.preventDefault();
 
-    if(email === ""){
+        const emailValue = email.value.trim();
 
-        showError(
-            "Email Required",
-            "Please enter your registered email address."
-        );
+        // ===============================
+        // Validation
+        // ===============================
 
-        emailInput.focus();
+        if(emailValue === ""){
 
-        return;
+            showError(
+                "Email Required",
+                "Please enter your registered PlateTrack email address."
+            );
 
-    }
+            email.focus();
 
-    // Email Validation
+            return;
 
-    const emailPattern =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        }
 
-    if(!emailPattern.test(email)){
+        const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        showError(
-            "Invalid Email",
-            "Please enter a valid email address."
-        );
+        if(!emailPattern.test(emailValue)){
 
-        emailInput.focus();
+            showError(
+                "Invalid Email",
+                "Please enter a valid email address."
+            );
 
-        return;
+            email.focus();
 
-    }
+            return;
 
-    // Loading State
+        }
 
-    sendCodeBtn.disabled = true;
+        // ===============================
+        // Loading State
+        // ===============================
 
-    sendCodeBtn.innerHTML = `
-    <i class="fa-solid fa-spinner fa-spin"></i>
-    &nbsp;
-    Sending Verification Code...
-    `;
+        button.disabled = true;
 
-    // Simulate Server
+        button.classList.add("loading");
 
-    setTimeout(function(){
+        button.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Sending Verification Code...
+        `;
 
-        sendCodeBtn.disabled = false;
+        // Simulated request for the static prototype.
 
-        sendCodeBtn.innerHTML =
-        "Send Verification Code";
+        setTimeout(() => {
 
-        showSuccess(
+            // ===============================
+            // Success State
+            // ===============================
 
-            "Verification Code Sent",
+            button.classList.remove("loading");
 
-            "A verification code has been sent to your registered email address.",
+            button.classList.add("success");
 
-            function(){
+            button.innerHTML = `
+                <i class="fa-solid fa-circle-check"></i>
+                Verification Code Sent
+            `;
 
-                window.location.href =
-                "verification.html";
+            setTimeout(() => {
 
-            }
+                showSuccess(
+                    "Verification Code Sent",
+                    "A 6-digit verification code has been sent to your registered email address.<br><br>Please check your Inbox or Spam folder before continuing.",
+                    () => {
 
-        );
+                        window.location.href = "verification.html";
 
-    },2000);
+                    },
+                    "Continue"
 
-}
+                );
+
+                // Reset button if page remains
+
+                button.disabled = false;
+
+                button.classList.remove("success");
+
+                button.innerHTML =
+                "Send Verification Code";
+
+            }, 900);
+
+        }, 1800);
+
+    });
+
+});

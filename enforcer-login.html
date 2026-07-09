@@ -13,6 +13,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/modal.css">
 
@@ -22,14 +24,16 @@
 
     <div class="background-grid"></div>
 
-    <div class="login-wrapper">
+    <main class="login-wrapper">
 
-        <div class="login-card">
+        <section class="login-card">
+
+            <!-- LOGO AREA -->
 
             <div class="logo-area">
 
                 <div class="logo-box">
-                    🛡️
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
 
                 <h1>PlateTrack</h1>
@@ -44,52 +48,69 @@
 
             </div>
 
+            <!-- WELCOME TEXT -->
+
             <div class="welcome">
 
                 <h2>Welcome Back</h2>
 
                 <p>
-                    Sign in to continue to PlateTrack
+                    Log in to continue to your enforcement dashboard.
                 </p>
 
             </div>
+
+            <!-- LOGIN FORM -->
 
             <form id="loginForm" autocomplete="off">
 
                 <div class="input-group">
 
-                    <label for="email">Email Address</label>
+                    <label for="email">
+                        Email Address
+                    </label>
 
-                    <input
-                        id="email"
-                        type="email"
-                        maxlength="100"
-                        autocomplete="off"
-                        placeholder="officer@platetrack.gov.ph"
-                        required>
+                    <div class="input-box">
+
+                        <i class="fa-solid fa-envelope input-icon"></i>
+
+                        <input
+                            id="email"
+                            type="email"
+                            maxlength="100"
+                            autocomplete="off"
+                            placeholder="officer@platetrack.gov.ph"
+                            required>
+
+                    </div>
 
                 </div>
 
                 <div class="input-group">
 
-                    <label for="password">Password</label>
+                    <label for="password">
+                        Password
+                    </label>
 
-                    <div class="password-box">
+                    <div class="input-box password-box">
+
+                        <i class="fa-solid fa-lock input-icon"></i>
 
                         <input
                             id="password"
                             type="password"
                             maxlength="50"
                             autocomplete="off"
-                            placeholder="Enter Password"
+                            placeholder="Enter your password"
                             required>
 
                         <button
                             type="button"
                             id="togglePassword"
+                            class="toggle-password"
                             aria-label="Show Password">
 
-                            👁
+                            <i class="fa-solid fa-eye"></i>
 
                         </button>
 
@@ -97,9 +118,9 @@
 
                 </div>
 
-                <div class="remember">
+                <div class="form-options">
 
-                    <label>
+                    <label class="remember">
 
                         <input
                             type="checkbox"
@@ -111,24 +132,20 @@
 
                     </label>
 
-                </div>
+                    <a
+                        href="forgot-password.html"
+                        class="forgot-link">
 
-                <div class="account-links">
-
-                    <a href="forgot-password.html">
                         Forgot Password?
-                    </a>
 
-                    <a href="enforcer-register.html">
-                        Create Account
                     </a>
 
                 </div>
 
                 <button
-                    type="button"
+                    type="submit"
                     class="login-btn"
-                    onclick="loginOfficer()">
+                    id="loginButton">
 
                     Sign in to System
 
@@ -136,18 +153,38 @@
 
             </form>
 
-            <div class="back-link">
+            <!-- CREATE ACCOUNT -->
 
-                <a href="index.html">
-                    ← Back to Portal Selection
+            <div class="create-account">
+
+                <span>
+                    New traffic enforcer?
+                </span>
+
+                <a href="enforcer-register.html">
+                    Create Account
                 </a>
 
             </div>
 
+            <!-- BACK LINK -->
+
+            <div class="back-link">
+
+                <a href="index.html">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Portal Selection
+                </a>
+
+            </div>
+
+            <!-- FOOTER -->
+
             <div class="footer">
 
                 <span>
-                    🔒 Secure Login
+                    <i class="fa-solid fa-lock"></i>
+                    Secure Login
                 </span>
 
                 <small>
@@ -156,9 +193,9 @@
 
             </div>
 
-        </div>
+        </section>
 
-    </div>
+    </main>
 
     <!-- GLOBAL MODAL -->
 
@@ -170,7 +207,7 @@
                 id="modalIcon"
                 class="modal-icon">
 
-                ✅
+                <i class="fa-solid fa-circle-check"></i>
 
             </div>
 

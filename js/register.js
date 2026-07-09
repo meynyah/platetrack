@@ -1,18 +1,33 @@
 // =========================================
-// PlateTrack Register
+// PlateTrack | Enforcer Register
 // =========================================
 
-const step1 =
-document.getElementById("step1");
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+const progressFill = document.getElementById("progressFill");
+const stepText = document.getElementById("stepText");
 
-const step2 =
-document.getElementById("step2");
+const password = document.getElementById("password");
+const confirmPassword = document.getElementById("confirmPassword");
 
-const progressFill =
-document.getElementById("progressFill");
+const togglePassword = document.getElementById("togglePassword");
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
-const stepText =
-document.getElementById("stepText");
+const registerBtn = document.getElementById("registerBtn");
+
+const strengthFill = document.getElementById("strengthFill");
+const strengthText = document.getElementById("strengthText");
+
+const confirmIcon = document.getElementById("confirmIcon");
+const passwordMatch = document.getElementById("passwordMatch");
+
+const rules = {
+    length: document.getElementById("ruleLength"),
+    upper: document.getElementById("ruleUpper"),
+    lower: document.getElementById("ruleLower"),
+    number: document.getElementById("ruleNumber"),
+    special: document.getElementById("ruleSpecial")
+};
 
 // =========================================
 // NEXT STEP
@@ -20,45 +35,25 @@ document.getElementById("stepText");
 
 function nextStep(){
 
-    const firstName =
-    document.getElementById("firstName").value.trim();
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const badgeNumber = document.getElementById("badgeNumber").value.trim();
 
-    const lastName =
-    document.getElementById("lastName").value.trim();
-
-    const badgeNumber =
-    document.getElementById("badgeNumber").value.trim();
-
-    const employeeID =
-    document.getElementById("employeeID").value.trim();
-
-    if(
-        firstName === "" ||
-        lastName === "" ||
-        badgeNumber === "" ||
-        employeeID === ""
-    ){
+    if(firstName === "" || lastName === "" || badgeNumber === ""){
 
         showError(
-
             "Incomplete Information",
-
-            "Please complete all required fields before continuing."
-
+            "Please complete all required personal information fields."
         );
 
         return;
-
     }
 
     step1.style.display = "none";
-
     step2.style.display = "block";
 
     progressFill.style.width = "100%";
-
     stepText.textContent = "Step 2 of 2";
-
 }
 
 // =========================================
@@ -68,122 +63,77 @@ function nextStep(){
 function previousStep(){
 
     step2.style.display = "none";
-
     step1.style.display = "block";
 
     progressFill.style.width = "50%";
-
     stepText.textContent = "Step 1 of 2";
-
 }
 
 // =========================================
-// PASSWORD SHOW / HIDE
+// SHOW / HIDE PASSWORD
 // =========================================
 
-const password =
-document.getElementById("password");
+function toggle(input, button){
 
-const confirmPassword =
-document.getElementById("confirmPassword");
+    const icon = button.querySelector("i");
 
-const togglePassword =
-document.getElementById("togglePassword");
-
-const toggleConfirmPassword =
-document.getElementById("toggleConfirmPassword");
-
-function toggle(input,button){
-
-    if(input.type==="password"){
-
-        input.type="text";
-
-        button.innerHTML =
-        '<i class="fa-solid fa-eye-slash"></i>';
-
+    if(input.type === "password"){
+        input.type = "text";
+        icon.className = "fa-solid fa-eye-slash";
+    }else{
+        input.type = "password";
+        icon.className = "fa-solid fa-eye";
     }
-
-    else{
-
-        input.type="password";
-
-        button.innerHTML =
-        '<i class="fa-solid fa-eye"></i>';
-
-    }
-
 }
 
-togglePassword.addEventListener("click",function(){
-
-    toggle(password,togglePassword);
-
+togglePassword.addEventListener("click", () => {
+    toggle(password, togglePassword);
 });
 
-toggleConfirmPassword.addEventListener("click",function(){
-
-    toggle(confirmPassword,toggleConfirmPassword);
-
+toggleConfirmPassword.addEventListener("click", () => {
+    toggle(confirmPassword, toggleConfirmPassword);
 });
 
 // =========================================
-// PASSWORD STRENGTH
+// PASSWORD RULES
 // =========================================
 
-const strengthFill =
-document.getElementById("strengthFill");
+function updateRule(rule, valid, hasTyped){
 
-const strengthText =
-document.getElementById("strengthText");
+    const icon = rule.querySelector("i");
 
-const rules = {
+    rule.classList.remove("valid", "invalid");
 
-    length:document.getElementById("ruleLength"),
-    upper:document.getElementById("ruleUpper"),
-    lower:document.getElementById("ruleLower"),
-    number:document.getElementById("ruleNumber"),
-    special:document.getElementById("ruleSpecial")
-
-};
-
-function updateRule(rule,valid){
+    if(!hasTyped){
+        icon.className = "fa-regular fa-circle";
+        return;
+    }
 
     if(valid){
-
         rule.classList.add("valid");
-
-        rule.querySelector("i").className =
-        "fa-solid fa-circle-check";
-
+        icon.className = "fa-solid fa-circle-check";
     }else{
-
-        rule.classList.remove("valid");
-
-        rule.querySelector("i").className =
-        "fa-solid fa-circle-xmark";
-
+        rule.classList.add("invalid");
+        icon.className = "fa-solid fa-circle-xmark";
     }
-
 }
-
-password.addEventListener("input",checkPassword);
 
 function checkPassword(){
 
     const value = password.value;
 
+    const hasTyped = value.length > 0;
     const hasLength = value.length >= 8;
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
     const hasNumber = /[0-9]/.test(value);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
 
-    updateRule(rules.length,hasLength);
-    updateRule(rules.upper,hasUpper);
-    updateRule(rules.lower,hasLower);
-    updateRule(rules.number,hasNumber);
-    updateRule(rules.special,hasSpecial);
+    updateRule(rules.length, hasLength, hasTyped);
+    updateRule(rules.upper, hasUpper, hasTyped);
+    updateRule(rules.lower, hasLower, hasTyped);
+    updateRule(rules.number, hasNumber, hasTyped);
+    updateRule(rules.special, hasSpecial, hasTyped);
 
     let score = 0;
 
@@ -193,147 +143,202 @@ function checkPassword(){
     if(hasNumber) score++;
     if(hasSpecial) score++;
 
-    if(score<=1){
-
-        strengthFill.style.width="20%";
-        strengthFill.style.background="#dc3545";
-        strengthText.textContent="Weak";
-
+    if(!hasTyped){
+        strengthFill.style.width = "0%";
+        strengthFill.style.background = "#223656";
+        strengthText.textContent = "—";
+        return score;
     }
 
-    else if(score==2){
-
-        strengthFill.style.width="45%";
-        strengthFill.style.background="#ff9800";
-        strengthText.textContent="Fair";
-
+    if(score <= 1){
+        strengthFill.style.width = "20%";
+        strengthFill.style.background = "#ef4444";
+        strengthText.textContent = "Weak";
+        strengthText.style.color = "#f87171";
+    }else if(score === 2){
+        strengthFill.style.width = "45%";
+        strengthFill.style.background = "#f97316";
+        strengthText.textContent = "Fair";
+        strengthText.style.color = "#fb923c";
+    }else if(score === 3 || score === 4){
+        strengthFill.style.width = "75%";
+        strengthFill.style.background = "#facc15";
+        strengthText.textContent = "Good";
+        strengthText.style.color = "#fde047";
+    }else{
+        strengthFill.style.width = "100%";
+        strengthFill.style.background = "#22c55e";
+        strengthText.textContent = "Strong";
+        strengthText.style.color = "#4ade80";
     }
 
-    else if(score==3 || score==4){
-
-        strengthFill.style.width="75%";
-        strengthFill.style.background="#facc15";
-        strengthText.textContent="Good";
-
-    }
-
-    else{
-
-        strengthFill.style.width="100%";
-        strengthFill.style.background="#22c55e";
-        strengthText.textContent="Strong";
-
-    }
-
+    return score;
 }
+
+// =========================================
+// PASSWORD MATCH
+// =========================================
+
+function checkPasswordMatch(){
+
+    const box = confirmPassword.parentElement;
+
+    if(confirmPassword.value === ""){
+
+        passwordMatch.textContent = "";
+        passwordMatch.className = "password-match";
+
+        box.classList.remove("success", "error");
+
+        confirmIcon.className = "fa-solid fa-lock-open input-icon";
+
+        return false;
+    }
+
+    if(password.value === confirmPassword.value){
+
+        passwordMatch.innerHTML =
+        '<i class="fa-solid fa-circle-check"></i> Passwords match';
+
+        passwordMatch.className = "password-match success";
+
+        box.classList.remove("error");
+        box.classList.add("success");
+
+        confirmIcon.className = "fa-solid fa-circle-check input-icon";
+
+        return true;
+    }
+
+    passwordMatch.innerHTML =
+    '<i class="fa-solid fa-circle-xmark"></i> Passwords do not match';
+
+    passwordMatch.className = "password-match error";
+
+    box.classList.remove("success");
+    box.classList.add("error");
+
+    confirmIcon.className = "fa-solid fa-circle-xmark input-icon";
+
+    return false;
+}
+
+password.addEventListener("input", () => {
+    checkPassword();
+    checkPasswordMatch();
+});
+
+confirmPassword.addEventListener("input", checkPasswordMatch);
 
 // =========================================
 // CREATE ACCOUNT
 // =========================================
 
-const registerBtn =
-document.getElementById("registerBtn");
+registerBtn.addEventListener("click", function(){
 
-registerBtn.addEventListener("click",function(){
+    const email = document.getElementById("email").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    const agreement = document.getElementById("agreement");
 
-    const email =
-    document.getElementById("email").value.trim();
+    const score = checkPassword();
+    const isMatch = checkPasswordMatch();
 
-    const mobile =
-    document.getElementById("mobile").value.trim();
-
-    const agreement =
-    document.getElementById("agreement");
-
-    if(
-
-        email==="" ||
-        password.value==="" ||
-        confirmPassword.value===""
-
-    ){
+    if(email === "" || password.value === "" || confirmPassword.value === ""){
 
         showError(
-
             "Incomplete Information",
-
-            "Please complete all required fields."
-
+            "Please complete all required account information fields."
         );
 
         return;
-
     }
 
-    if(password.value!==confirmPassword.value){
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!emailPattern.test(email)){
 
         showError(
-
-            "Password Mismatch",
-
-            "Your passwords do not match."
-
+            "Invalid Email",
+            "Please enter a valid official email address."
         );
 
         return;
-
     }
 
-    if(password.value.length<8){
+    if(mobile !== "" && !/^09\d{9}$/.test(mobile)){
 
         showError(
+            "Invalid Mobile Number",
+            "Please enter a valid 11-digit Philippine mobile number."
+        );
 
+        return;
+    }
+
+    if(score < 5){
+
+        showError(
             "Weak Password",
-
-            "Please create a stronger password."
-
+            "Please follow all password requirements before creating your account."
         );
 
         return;
+    }
 
+    if(!isMatch){
+
+        showError(
+            "Password Mismatch",
+            "Your passwords do not match. Please check your confirmation password."
+        );
+
+        return;
     }
 
     if(!agreement.checked){
 
         showError(
-
             "Agreement Required",
-
             "Please certify that you are an authorized Traffic Enforcer."
-
         );
 
         return;
-
     }
 
-    registerBtn.disabled=true;
+    registerBtn.disabled = true;
+    registerBtn.classList.add("loading");
 
-    registerBtn.innerHTML=`
+    registerBtn.innerHTML = `
         <i class="fa-solid fa-spinner fa-spin"></i>
-        Creating Account...
+        Creating Secure Account...
     `;
 
-    setTimeout(function(){
+    setTimeout(() => {
 
-        registerBtn.disabled=false;
+        registerBtn.classList.remove("loading");
+        registerBtn.classList.add("success");
 
-        registerBtn.innerHTML="Create Account";
+        registerBtn.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            Registration Submitted
+        `;
 
-        showSuccess(
+        setTimeout(() => {
 
-            "Registration Submitted",
+            showSuccess(
+                "Registration Submitted",
+                "Your registration has been submitted successfully.<br><br>Your account is now pending administrator approval.<br><br>You will receive an email once your account has been reviewed.",
+                () => {
+                    window.location.href = "enforcer-login.html";
+                },
+                "Back to Login"
+            );
 
-            "Your registration has been submitted successfully.\n\nYour account is now pending administrator approval.\n\nYou will receive an email once your account has been reviewed.\n\nOnly approved officers can sign in.",
+            registerBtn.disabled = false;
+            registerBtn.classList.remove("success");
+            registerBtn.innerHTML = "Create Account";
 
-            function(){
+        }, 900);
 
-                window.location.href="enforcer-login.html";
-
-            }
-
-        );
-
-    },2000);
-
+    }, 1800);
 });

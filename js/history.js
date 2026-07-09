@@ -3,51 +3,23 @@
 // HISTORY PAGE
 // ==========================================
 
-
-// ==========================================
-// PAGE LOAD
-// ==========================================
-
 document.addEventListener("DOMContentLoaded",function(){
 
     loadHistory();
 
 });
 
-function formatDate(dateString){
+// ==========================================
+// GET HISTORY
+// ==========================================
 
-    const date = new Date(dateString);
+function getHistoryRecords(){
 
-    if(isNaN(date)){
-
-        return dateString;
-
-    }
-
-    const formattedDate = date.toLocaleDateString("en-US",{
-
-        month:"long",
-
-        day:"numeric",
-
-        year:"numeric"
-
-    });
-
-    const formattedTime = date.toLocaleTimeString("en-US",{
-
-        hour:"numeric",
-
-        minute:"2-digit",
-
-        hour12:true
-
-    });
-
-    return `${formattedDate} • ${formattedTime}`;
+    return JSON.parse(
+        localStorage.getItem("plateTrackHistory")
+    ) || [];
 
 }
-
 
 // ==========================================
 // LOAD HISTORY
@@ -55,11 +27,7 @@ function formatDate(dateString){
 
 function loadHistory(data = null){
 
-    const history = data || JSON.parse(
-
-    localStorage.getItem("plateTrackHistory")
-
-    ) || [];   
+    const history = data || getHistoryRecords();
 
     const historyList =
     document.getElementById("historyList");
@@ -69,148 +37,93 @@ function loadHistory(data = null){
 
     historyList.innerHTML = "";
 
-    if(history.length===0){
+    if(history.length === 0){
 
-        emptyState.style.display="flex";
+        emptyState.style.display = "flex";
 
         return;
 
     }
 
-    emptyState.style.display="none";
+    emptyState.style.display = "none";
 
     history.forEach(function(item,index){
 
         historyList.innerHTML += `
+            <div class="history-card">
 
-        <div class="history-card">
+                <div class="history-header">
 
-            <div class="history-header">
+                    <div>
+                        <div class="record-id">
+                            ${item.recordId || "N/A"}
+                        </div>
 
-                <div>
-
-                    <div class="record-id">
-
-                        ${item.recordId || "N/A"}
-
+                        <div class="plate-number">
+                            ${item.plateNumber || "Unknown Plate"}
+                        </div>
                     </div>
 
-                    <div class="plate-number">
-
-                        ${item.plateNumber}
-
+                    <div class="violation-badge">
+                        ${item.violation || "Violation"}
                     </div>
 
                 </div>
 
-                <div class="violation-badge">
+                <div class="history-details">
 
-                    ${item.violation}
+                    <div class="detail-row">
+                        <span class="detail-label">Vehicle</span>
+                        <span class="detail-value">${item.vehicleType || "-"}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Color</span>
+                        <span class="detail-value">${item.vehicleColor || "-"}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Location</span>
+                        <span class="detail-value">${item.location || "-"}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Date</span>
+                        <span class="detail-value">${item.date || "-"}</span>
+                    </div>
+
+                </div>
+
+                <div class="card-actions">
+
+                    <button
+                    class="view-btn"
+                    type="button"
+                    onclick="viewRecord(${index})">
+
+                        <i class="fa-solid fa-eye"></i>
+                        View
+
+                    </button>
+
+                    <button
+                    class="delete-btn"
+                    type="button"
+                    onclick="deleteRecord(${index})">
+
+                        <i class="fa-solid fa-trash"></i>
+                        Delete
+
+                    </button>
 
                 </div>
 
             </div>
-
-            <div class="history-details">
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-
-                        Vehicle
-
-                    </span>
-
-                    <span class="detail-value">
-
-                        ${item.vehicleType}
-
-                    </span>
-
-                </div>
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-
-                        Color
-
-                    </span>
-
-                    <span class="detail-value">
-
-                        ${item.vehicleColor}
-
-                    </span>
-
-                </div>
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-
-                        Location
-
-                    </span>
-
-                    <span class="detail-value">
-
-                        ${item.location}
-
-                    </span>
-
-                </div>
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-
-                        Date
-
-                    </span>
-
-                    <span class="detail-value">
-
-                        ${(item.date)}
-
-                    </span>
-
-                </div>
-
-            </div>
-
-            <div class="card-actions">
-
-                <button
-                class="view-btn"
-                onclick="viewRecord(${index})">
-
-                    <i class="fa-solid fa-eye"></i>
-
-                    View
-
-                </button>
-
-                <button
-                class="delete-btn"
-                onclick="deleteRecord(${index})">
-
-                    <i class="fa-solid fa-trash"></i>
-
-                    Delete
-
-                </button>
-
-            </div>
-
-        </div>
-
         `;
 
     });
 
 }
-
 
 // ==========================================
 // SEARCH + FILTER
@@ -218,34 +131,48 @@ function loadHistory(data = null){
 
 function applyFilters(){
 
-    const keyword = document
+    const keyword =
+    document
     .getElementById("searchInput")
     .value
     .trim()
     .toLowerCase();
 
-    const filter = document
+    const filter =
+    document
     .getElementById("violationFilter")
     .value;
 
-    const history = JSON.parse(
-
-        localStorage.getItem("plateTrackHistory")
-
-    ) || [];
+    const history = getHistoryRecords();
 
     const filteredHistory = history.filter(function(item){
 
-        const matchPlate =
-        item.plateNumber
-        .toLowerCase()
-        .includes(keyword);
+        const plate =
+        (item.plateNumber || "").toLowerCase();
+
+        const vehicle =
+        (item.vehicleType || "").toLowerCase();
+
+        const location =
+        (item.location || "").toLowerCase();
+
+        const recordId =
+        (item.recordId || "").toLowerCase();
+
+        const violation =
+        item.violation || "";
+
+        const matchKeyword =
+        plate.includes(keyword) ||
+        vehicle.includes(keyword) ||
+        location.includes(keyword) ||
+        recordId.includes(keyword);
 
         const matchViolation =
         filter === "" ||
-        item.violation === filter;
+        violation === filter;
 
-        return matchPlate && matchViolation;
+        return matchKeyword && matchViolation;
 
     });
 
@@ -259,17 +186,34 @@ function applyFilters(){
 
 function viewRecord(index){
 
-    const history = JSON.parse(
-
-        localStorage.getItem("plateTrackHistory")
-
-    ) || [];
+    const history = getHistoryRecords();
 
     const item = history[index];
 
     if(!item){
-
         return;
+    }
+
+    const imageBox =
+    document.getElementById("capturedDetailImage");
+
+    if(item.capturedImage){
+
+        imageBox.innerHTML = `
+            <img
+            src="${item.capturedImage}"
+            alt="Captured vehicle evidence">
+        `;
+
+    }
+    else{
+
+        imageBox.innerHTML = `
+            <div class="no-image-box">
+                <i class="fa-solid fa-camera"></i>
+                <p>No captured image available</p>
+            </div>
+        `;
 
     }
 
@@ -292,7 +236,7 @@ function viewRecord(index){
     item.location || "-";
 
     document.getElementById("detailDate").textContent =
-    (item.date);
+    item.date || "-";
 
     document.getElementById("detailNotes").textContent =
     item.notes && item.notes.trim() !== ""
@@ -304,7 +248,6 @@ function viewRecord(index){
 
 }
 
-
 // ==========================================
 // CLOSE DETAILS MODAL
 // ==========================================
@@ -315,7 +258,6 @@ function closeDetailsModal(){
     "none";
 
 }
-
 
 // ==========================================
 // DELETE RECORD
@@ -331,11 +273,7 @@ function deleteRecord(index){
 
         function(){
 
-            let history = JSON.parse(
-
-                localStorage.getItem("plateTrackHistory")
-
-            ) || [];
+            let history = getHistoryRecords();
 
             history.splice(index,1);
 
@@ -363,14 +301,14 @@ function deleteRecord(index){
 
 }
 
-
 // ==========================================
 // CLOSE MODAL WHEN CLICKING OUTSIDE
 // ==========================================
 
-window.onclick = function(event){
+window.addEventListener("click",function(event){
 
-    const modal = document.getElementById("detailsModal");
+    const modal =
+    document.getElementById("detailsModal");
 
     if(event.target === modal){
 
@@ -378,5 +316,4 @@ window.onclick = function(event){
 
     }
 
-}
-
+});
