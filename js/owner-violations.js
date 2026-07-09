@@ -59,20 +59,24 @@ function requireOwnerSession(){
 // DATA HELPERS
 // ==========================================
 
+function normalizePlate(plate){
+
+    return (plate || "").toUpperCase().replace(/\s+/g, "");
+
+}
+
 function getOwnerViolations(){
 
     const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
 
-    const ownerPlates = (currentOwner.plates || []).map(function(plate){
-        return plate.toUpperCase();
-    });
+    const ownerPlates = (currentOwner.plates || []).map(normalizePlate);
 
     return history
         .map(function(record, index){
             return Object.assign({ historyIndex: index }, record);
         })
         .filter(function(record){
-            return ownerPlates.includes((record.plateNumber || "").toUpperCase());
+            return ownerPlates.includes(normalizePlate(record.plateNumber));
         });
 
 }

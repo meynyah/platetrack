@@ -60,16 +60,20 @@ function requireOwnerSession(){
 
 }
 
+function normalizePlate(plate){
+
+    return (plate || "").toUpperCase().replace(/\s+/g, "");
+
+}
+
 function getOwnerViolations(owner){
 
     const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
 
-    const ownerPlates = (owner.plates || []).map(function(plate){
-        return plate.toUpperCase();
-    });
+    const ownerPlates = (owner.plates || []).map(normalizePlate);
 
     return history.filter(function(record){
-        return ownerPlates.includes((record.plateNumber || "").toUpperCase());
+        return ownerPlates.includes(normalizePlate(record.plateNumber));
     });
 
 }
