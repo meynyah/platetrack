@@ -30,6 +30,122 @@ const rules = {
 };
 
 // =========================================
+// VEHICLE ROWS (Plate + Type + Color)
+// =========================================
+
+let vehicleRowCount = 0;
+
+function createVehicleRowHTML(index){
+
+    return `
+        <div class="vehicle-row" data-row="${index}">
+
+            ${index > 0 ? `
+                <button
+                type="button"
+                class="remove-vehicle-btn"
+                onclick="removeVehicleRow(${index})"
+                aria-label="Remove vehicle">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+            ` : ""}
+
+            <div class="input-row">
+
+                <div class="input-group">
+                    <label>Plate Number</label>
+                    <input
+                    type="text"
+                    class="vehiclePlate"
+                    data-row="${index}"
+                    placeholder="e.g. ABC 1234"
+                    required>
+                </div>
+
+                <div class="input-group">
+                    <label>Vehicle Type</label>
+                    <input
+                    type="text"
+                    class="vehicleType"
+                    data-row="${index}"
+                    placeholder="e.g. Toyota Vios"
+                    required>
+                </div>
+
+            </div>
+
+            <div class="input-group">
+                <label>Vehicle Color</label>
+                <input
+                type="text"
+                class="vehicleColor"
+                data-row="${index}"
+                placeholder="e.g. White"
+                required>
+            </div>
+
+        </div>
+    `;
+
+}
+
+function addVehicleRow(){
+
+    const container = document.getElementById("vehicleRows");
+
+    container.insertAdjacentHTML("beforeend", createVehicleRowHTML(vehicleRowCount));
+
+    vehicleRowCount++;
+
+}
+
+function removeVehicleRow(index){
+
+    const row = document.querySelector(`.vehicle-row[data-row="${index}"]`);
+
+    if(row){
+        row.remove();
+    }
+
+}
+
+function getVehicles(){
+
+    const rows = document.querySelectorAll(".vehicle-row");
+
+    const vehicles = [];
+
+    rows.forEach(function(row){
+
+        const plate = row.querySelector(".vehiclePlate").value.trim().toUpperCase();
+        const type = row.querySelector(".vehicleType").value.trim();
+        const color = row.querySelector(".vehicleColor").value.trim();
+
+        if(plate !== "" || type !== "" || color !== ""){
+
+            vehicles.push({
+                plateNumber: plate,
+                vehicleType: type,
+                vehicleColor: color
+            });
+
+        }
+
+    });
+
+    return vehicles;
+
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    addVehicleRow();
+
+});
+
+// =========================================
 // OWNER STORAGE HELPERS
 // =========================================
 
@@ -54,9 +170,8 @@ function nextStep(){
     const fullName = document.getElementById("fullName").value.trim();
     const mobile = document.getElementById("mobile").value.trim();
     const address = document.getElementById("address").value.trim();
-    const plateNumbers = document.getElementById("plateNumbers").value.trim();
 
-    if(fullName === "" || mobile === "" || address === "" || plateNumbers === ""){
+    if(fullName === "" || mobile === "" || address === ""){
 
         showError(
             "Incomplete Information",
@@ -74,6 +189,32 @@ function nextStep(){
         );
 
         return;
+    }
+
+    const vehicles = getVehicles();
+
+    if(vehicles.length === 0){
+
+        showError(
+            "Vehicle Required",
+            "Please register at least one vehicle."
+        );
+
+        return;
+    }
+
+    for(let i = 0; i < vehicles.length; i++){
+
+        if(vehicles[i].plateNumber === "" || vehicles[i].vehicleType === "" || vehicles[i].vehicleColor === ""){
+
+            showError(
+                "Incomplete Vehicle Information",
+                "Please complete the plate number, vehicle type, and color for each registered vehicle."
+            );
+
+            return;
+        }
+
     }
 
     step1.style.display = "none";
@@ -267,13 +408,7 @@ registerBtn.addEventListener("click", function(){
     const mobile = document.getElementById("mobile").value.trim();
     const address = document.getElementById("address").value.trim();
 
-    const plateNumbers = document
-        .getElementById("plateNumbers")
-        .value
-        .trim()
-        .split(",")
-        .map(function(plate){ return plate.trim().toUpperCase(); })
-        .filter(function(plate){ return plate !== ""; });
+    const vehicles = getVehicles();
 
     const email = document.getElementById("email").value.trim().toLowerCase();
     const agreement = document.getElementById("agreement");
@@ -373,9 +508,10 @@ registerBtn.addEventListener("click", function(){
                 fullName: fullName,
                 mobile: mobile,
                 address: address,
-                plates: plateNumbers,
+                vehicles: vehicles,
                 email: email,
-                password: password.value
+                password: password.value,
+                dateRegistered: new Date().toISOString()
             });
 
             saveOwners(owners);

@@ -69,7 +69,9 @@ function getOwnerViolations(){
 
     const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
 
-    const ownerPlates = (currentOwner.plates || []).map(normalizePlate);
+    const ownerPlates = (currentOwner.vehicles || []).map(function(vehicle){
+        return normalizePlate(vehicle.plateNumber);
+    });
 
     return history
         .map(function(record, index){

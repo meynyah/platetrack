@@ -29,6 +29,9 @@ href="css/modal.css">
 <link rel="stylesheet"
 href="css/violation.css">
 
+<link rel="stylesheet"
+href="css/evidence-capture.css">
+
 </head>
 
 <body>
@@ -167,6 +170,83 @@ VEHICLE INFORMATION
         type="text"
         id="vehicleColor"
         placeholder="White">
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+VEHICLE EVIDENCE (OPTIONAL PHOTO CAPTURE)
+========================================== -->
+
+<div class="card-title">
+
+    <i class="fa-solid fa-camera"></i>
+
+    <span>
+
+        Vehicle Evidence (Optional)
+
+    </span>
+
+</div>
+
+<div class="evidence-card">
+
+    <div class="evidence-preview" id="evidencePreview">
+
+        <video id="evidenceVideo" autoplay playsinline muted></video>
+
+        <canvas id="evidenceCanvas" style="display:none;"></canvas>
+
+        <img id="evidencePhoto" alt="Captured vehicle evidence">
+
+        <div class="evidence-placeholder" id="evidencePlaceholder">
+
+            <i class="fa-solid fa-camera"></i>
+            <p>No photo captured yet</p>
+            <small>Attach a photo if you're recording this violation manually.</small>
+
+        </div>
+
+    </div>
+
+    <div class="evidence-buttons">
+
+        <button
+        type="button"
+        id="openCameraBtn"
+        class="evidence-btn primary"
+        onclick="openEvidenceCamera()">
+
+            <i class="fa-solid fa-camera"></i>
+            Open Camera
+
+        </button>
+
+        <button
+        type="button"
+        id="captureEvidenceBtn"
+        class="evidence-btn primary"
+        style="display:none;"
+        onclick="captureEvidencePhoto()">
+
+            <i class="fa-solid fa-crosshairs"></i>
+            Capture Photo
+
+        </button>
+
+        <button
+        type="button"
+        id="retakeEvidenceBtn"
+        class="evidence-btn secondary"
+        style="display:none;"
+        onclick="retakeEvidencePhoto()">
+
+            <i class="fa-solid fa-rotate"></i>
+            Retake Photo
+
+        </button>
 
     </div>
 
@@ -350,10 +430,6 @@ LOCATION / OFFICER / DATE
 
 </div>
 
-    </div>
-
-</section>
-
 </div>
 
 <!-- ==========================================
@@ -365,11 +441,8 @@ GLOBAL MODAL
     <div class="modal-box">
 
         <div id="modalIcon" class="modal-icon">✅</div>
-
         <div id="modalTitle" class="modal-title">Success</div>
-
         <div id="modalMessage" class="modal-message">Message</div>
-
         <div id="modalButtons" class="modal-buttons"></div>
 
     </div>

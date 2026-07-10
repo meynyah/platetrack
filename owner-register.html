@@ -18,6 +18,7 @@
 
     <link rel="stylesheet" href="css/register.css">
     <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/owner-portal.css">
 
 </head>
 
@@ -166,27 +167,28 @@
 
                 </div>
 
-                <div class="input-group">
+                <div class="card-title">
 
-                    <label>
-
-                        Registered Plate Number(s)
-
-                    </label>
-
-                    <div class="input-box">
-
-                        <i class="fa-solid fa-id-card input-icon"></i>
-
-                        <input
-                        id="plateNumbers"
-                        type="text"
-                        placeholder="e.g. ABC 1234, XYZ 5678"
-                        required>
-
-                    </div>
+                    <i class="fa-solid fa-car-side"></i>
+                    <span>Registered Vehicles</span>
 
                 </div>
+
+                <div id="vehicleRows">
+
+                    <!-- Vehicle rows are injected here by JS -->
+
+                </div>
+
+                <button
+                type="button"
+                class="add-vehicle-btn"
+                onclick="addVehicleRow()">
+
+                    <i class="fa-solid fa-plus"></i>
+                    Add Another Vehicle
+
+                </button>
 
                 <button
                 type="button"

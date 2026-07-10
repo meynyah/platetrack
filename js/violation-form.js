@@ -6,6 +6,13 @@
 let isCameraMode = false;
 
 // ==========================================
+// EVIDENCE CAPTURE STATE
+// ==========================================
+
+let evidenceStream = null;
+let capturedEvidenceImage = null;
+
+// ==========================================
 // PAGE LOAD
 // ==========================================
 
@@ -79,6 +86,130 @@ function initializeForm(){
 }
 
 // ==========================================
+// EVIDENCE CAPTURE (OPTIONAL PHOTO)
+// ==========================================
+
+async function openEvidenceCamera(){
+
+    try{
+
+        evidenceStream = await navigator.mediaDevices.getUserMedia({
+            video:{ facingMode:"environment" },
+            audio:false
+        });
+
+        const video = document.getElementById("evidenceVideo");
+
+        video.srcObject = evidenceStream;
+        video.style.display = "block";
+
+        document.getElementById("evidencePlaceholder").style.display = "none";
+        document.getElementById("evidencePhoto").style.display = "none";
+
+        document.getElementById("openCameraBtn").style.display = "none";
+        document.getElementById("captureEvidenceBtn").style.display = "inline-flex";
+        document.getElementById("retakeEvidenceBtn").style.display = "none";
+
+    }
+    catch(error){
+
+        showError(
+            "Camera Error",
+            "Unable to access the device camera. Please check your camera permission."
+        );
+
+    }
+
+}
+
+function captureEvidencePhoto(){
+
+    const video = document.getElementById("evidenceVideo");
+    const canvas = document.getElementById("evidenceCanvas");
+
+    if(!video || !canvas){
+        return;
+    }
+
+    // Cap the resolution to keep the resulting image small,
+    // since this app stores everything as base64 text in
+    // the browser's localStorage (which has a limited quota).
+    const maxWidth = 640;
+    const sourceWidth = video.videoWidth || maxWidth;
+    const sourceHeight = video.videoHeight || 480;
+    const scale = Math.min(1, maxWidth / sourceWidth);
+
+    canvas.width = Math.round(sourceWidth * scale);
+    canvas.height = Math.round(sourceHeight * scale);
+
+    const context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    try{
+
+        capturedEvidenceImage = canvas.toDataURL("image/jpeg", 0.7);
+
+    }
+    catch(error){
+
+        console.error("Unable to capture evidence photo:", error);
+
+        showError(
+            "Capture Failed",
+            "Unable to capture the photo. Please try again."
+        );
+
+        return;
+
+    }
+
+    stopEvidenceCamera();
+
+    const photo = document.getElementById("evidencePhoto");
+
+    photo.src = capturedEvidenceImage;
+    photo.style.display = "block";
+
+    document.getElementById("captureEvidenceBtn").style.display = "none";
+    document.getElementById("retakeEvidenceBtn").style.display = "inline-flex";
+
+}
+
+function stopEvidenceCamera(){
+
+    if(evidenceStream){
+
+        evidenceStream.getTracks().forEach(function(track){
+            track.stop();
+        });
+
+        evidenceStream = null;
+
+    }
+
+    const video = document.getElementById("evidenceVideo");
+
+    if(video){
+        video.style.display = "none";
+    }
+
+}
+
+function retakeEvidencePhoto(){
+
+    capturedEvidenceImage = null;
+
+    document.getElementById("evidencePhoto").style.display = "none";
+    document.getElementById("evidencePlaceholder").style.display = "flex";
+
+    document.getElementById("retakeEvidenceBtn").style.display = "none";
+    document.getElementById("openCameraBtn").style.display = "inline-flex";
+
+}
+
+window.addEventListener("beforeunload", stopEvidenceCamera);
+
+// ==========================================
 // AUTO DATE & TIME
 // ==========================================
 
@@ -145,6 +276,8 @@ function setupViolationDropdown(){
 // ==========================================
 
 function goBack(){
+
+    stopEvidenceCamera();
 
     if(isCameraMode){
         window.location.href = "detection-result.html";
@@ -273,16 +406,60 @@ function saveViolation(){
 
         date:getCleanValue("recordDateTime"),
 
+        capturedImage: capturedEvidenceImage || "",
+
         source:isCameraMode ? "Camera Detection" : "Manual Entry"
 
     };
 
-    history.unshift(violationData);
+    try{
 
-    localStorage.setItem(
-        "plateTrackHistory",
-        JSON.stringify(history)
-    );
+        history.unshift(violationData);
+
+        localStorage.setItem(
+            "plateTrackHistory",
+            JSON.stringify(history)
+        );
+
+    }
+    catch(error){
+
+        // Storage quota exceeded is a real risk once photos are attached.
+        // Retry once without the photo so the violation record itself isn't lost.
+
+        console.error("Unable to save with photo, retrying without it:", error);
+
+        violationData.capturedImage = "";
+
+        history[0] = violationData;
+
+        try{
+
+            localStorage.setItem(
+                "plateTrackHistory",
+                JSON.stringify(history)
+            );
+
+            showWarning(
+                "Photo Not Saved",
+                "The violation was saved, but the photo was too large to store and was not attached."
+            );
+
+        }
+        catch(retryError){
+
+            showError(
+                "Save Failed",
+                "Unable to save this violation record. Your browser storage may be full."
+            );
+
+            return;
+
+        }
+
+    }
+
+    stopEvidenceCamera();
 
     localStorage.removeItem("plateTrackDetectionResult");
     localStorage.removeItem("plateTrackCapturedImage");

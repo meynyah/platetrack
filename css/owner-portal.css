@@ -32,6 +32,13 @@
     color:#6fa8ff;
 }
 
+.plate-chip-detail{
+    color:#9fb2d8;
+    font-weight:500;
+    letter-spacing:normal;
+    font-size:13px;
+}
+
 /* ==========================================
    APPEAL STATUS BADGE
    (owner-violations.html - violation cards)
@@ -100,4 +107,138 @@ body.light-mode .plate-chip{
 
 body.light-mode .plate-chip i{
     color:#3d6cff;
+}
+
+/* ==========================================
+   CARD TITLE (shared section heading)
+   Used by owner-register.html, owner-profile.html
+========================================== */
+
+.card-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:30px;
+    margin-bottom:18px;
+    color:#82aaff;
+    font-weight:700;
+    font-size:16px;
+}
+
+.card-title i{
+    font-size:18px;
+}
+
+/* ==========================================
+   VEHICLE ROWS
+   (owner-register.html, owner-profile.html - multi-vehicle registration)
+========================================== */
+
+.vehicle-row{
+    position:relative;
+    margin-bottom:18px;
+    padding:18px;
+    border-radius:16px;
+    background:rgba(21,39,66,.55);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.vehicle-row .input-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.vehicle-row .input-group{
+    margin-bottom:14px;
+}
+
+.vehicle-row .input-group:last-child{
+    margin-bottom:0;
+}
+
+.remove-vehicle-btn{
+    position:absolute;
+    top:14px;
+    right:14px;
+    width:32px;
+    height:32px;
+    border:none;
+    border-radius:10px;
+    background:rgba(239,68,68,.15);
+    color:#f87171;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.remove-vehicle-btn:hover{
+    background:#ef4444;
+    color:#ffffff;
+}
+
+.add-vehicle-btn{
+    width:100%;
+    margin-bottom:22px;
+    padding:14px;
+    border:1px dashed rgba(61,108,255,.45);
+    border-radius:14px;
+    background:rgba(61,108,255,.08);
+    color:#82aaff;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    transition:.25s;
+}
+
+.add-vehicle-btn:hover{
+    background:rgba(61,108,255,.16);
+    color:#ffffff;
+}
+
+@media(max-width:480px){
+
+    .vehicle-row .input-row{
+        grid-template-columns:1fr;
+    }
+
+}
+
+body.light-mode .vehicle-row{
+    background:#f7f9fc;
+    border-color:rgba(36,58,88,.10);
+}
+
+/* ==========================================
+   VEHICLE ACTION BUTTONS (owner-profile.html)
+========================================== */
+
+.vehicle-actions{
+    display:flex;
+    gap:8px;
+    flex-shrink:0;
+}
+
+.vehicle-actions button{
+    width:36px;
+    height:36px;
+    border:none;
+    border-radius:10px;
+    background:rgba(255,255,255,.08);
+    color:#c6d6ff;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.vehicle-actions button:hover{
+    background:#3d6cff;
+    color:#ffffff;
+}
+
+body.light-mode .vehicle-actions button{
+    background:#eef3fb;
+    color:#132033;
 }

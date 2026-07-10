@@ -70,7 +70,9 @@ function getOwnerViolations(owner){
 
     const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
 
-    const ownerPlates = (owner.plates || []).map(normalizePlate);
+    const ownerPlates = (owner.vehicles || []).map(function(vehicle){
+        return normalizePlate(vehicle.plateNumber);
+    });
 
     return history.filter(function(record){
         return ownerPlates.includes(normalizePlate(record.plateNumber));
@@ -147,23 +149,24 @@ function loadPlates(owner){
 
     plateList.innerHTML = "";
 
-    (owner.plates || []).forEach(function(plate){
+    (owner.vehicles || []).forEach(function(vehicle){
 
         plateList.innerHTML += `
             <div class="plate-chip">
                 <i class="fa-solid fa-id-card"></i>
-                ${plate}
+                ${vehicle.plateNumber}
+                <span class="plate-chip-detail">${vehicle.vehicleType || "-"} • ${vehicle.vehicleColor || "-"}</span>
             </div>
         `;
 
     });
 
-    if((owner.plates || []).length === 0){
+    if((owner.vehicles || []).length === 0){
 
         plateList.innerHTML = `
             <div class="plate-chip">
                 <i class="fa-solid fa-circle-info"></i>
-                No registered plates
+                No registered vehicles
             </div>
         `;
 
@@ -184,7 +187,7 @@ function loadStats(owner){
         return appeal.status === "Pending";
     });
 
-    document.getElementById("plateCount").textContent = (owner.plates || []).length;
+    document.getElementById("plateCount").textContent = (owner.vehicles || []).length;
     document.getElementById("violationCount").textContent = violations.length;
     document.getElementById("pendingAppeals").textContent = pending.length;
 
