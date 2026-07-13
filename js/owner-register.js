@@ -37,58 +37,96 @@ let vehicleRowCount = 0;
 
 function createVehicleRowHTML(index){
 
+    const vehicleNumber = index + 1;
+
     return `
         <div class="vehicle-row" data-row="${index}">
 
-            ${index > 0 ? `
-                <button
-                type="button"
-                class="remove-vehicle-btn"
-                onclick="removeVehicleRow(${index})"
-                aria-label="Remove vehicle">
+            <div class="vehicle-row-header">
 
-                    <i class="fa-solid fa-xmark"></i>
+                <div class="vehicle-row-title">
+                    <div class="vehicle-number">
+                        ${vehicleNumber}
+                    </div>
 
-                </button>
-            ` : ""}
-
-            <div class="input-row">
-
-                <div class="input-group">
-                    <label>Plate Number</label>
-                    <input
-                    type="text"
-                    class="vehiclePlate"
-                    data-row="${index}"
-                    placeholder="e.g. ABC 1234"
-                    required>
+                    <div>
+                        <h4>Vehicle ${vehicleNumber}</h4>
+                        <p>Enter the vehicle registration details.</p>
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Vehicle Type</label>
-                    <input
-                    type="text"
-                    class="vehicleType"
-                    data-row="${index}"
-                    placeholder="e.g. Toyota Vios"
-                    required>
-                </div>
+                ${index > 0 ? `
+                    <button
+                        type="button"
+                        class="remove-vehicle-btn"
+                        onclick="removeVehicleRow(${index})"
+                        aria-label="Remove vehicle">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+                ` : ""}
 
             </div>
 
-            <div class="input-group">
-                <label>Vehicle Color</label>
-                <input
-                type="text"
-                class="vehicleColor"
-                data-row="${index}"
-                placeholder="e.g. White"
-                required>
+            <div class="vehicle-fields-grid">
+
+                <div class="input-group vehicle-plate-field">
+                    <label>
+                        Plate Number
+                    </label>
+
+                    <div class="vehicle-input-box">
+                        <i class="fa-solid fa-id-card"></i>
+
+                        <input
+                            type="text"
+                            class="vehiclePlate"
+                            data-row="${index}"
+                            placeholder="e.g. ABC 1234"
+                            maxlength="12"
+                            required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>
+                        Vehicle Type / Model
+                    </label>
+
+                    <div class="vehicle-input-box">
+                        <i class="fa-solid fa-car-side"></i>
+
+                        <input
+                            type="text"
+                            class="vehicleType"
+                            data-row="${index}"
+                            placeholder="e.g. Toyota Vios"
+                            required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>
+                        Vehicle Color
+                    </label>
+
+                    <div class="vehicle-input-box">
+                        <i class="fa-solid fa-palette"></i>
+
+                        <input
+                            type="text"
+                            class="vehicleColor"
+                            data-row="${index}"
+                            placeholder="e.g. White"
+                            required>
+                    </div>
+                </div>
+
             </div>
 
         </div>
     `;
-
 }
 
 function addVehicleRow(){

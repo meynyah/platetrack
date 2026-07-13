@@ -89,6 +89,8 @@ function loadProfile(){
     document.getElementById("emailText").textContent = owner.email;
     document.getElementById("contactText").textContent = owner.mobile;
     document.getElementById("addressText").textContent = owner.address;
+    loadOwnerProfilePicture(owner.profilePicture);
+
 
     if(owner.dateRegistered){
 
@@ -118,49 +120,73 @@ function loadVehicles(owner){
     if(vehicles.length === 0){
 
         vehicleList.innerHTML = `
+
             <div class="info-item">
+
                 <div class="info-icon">
+
                     <i class="fa-solid fa-circle-info"></i>
+
                 </div>
+
                 <div class="info-content">
+
                     <span>No registered vehicles</span>
+
                     <strong>Tap the + button above to add one</strong>
+
                 </div>
+
             </div>
+
         `;
 
         return;
+
     }
 
     vehicles.forEach(function(vehicle, index){
 
         vehicleList.innerHTML += `
-            <div class="info-item">
+
+            <div class="info-item owner-vehicle-item">
 
                 <div class="info-icon">
+
                     <i class="fa-solid fa-car"></i>
+
                 </div>
 
                 <div class="info-content">
+
                     <span>${vehicle.plateNumber}</span>
-                    <strong>${vehicle.vehicleType || "-"} • ${vehicle.vehicleColor || "-"}</strong>
+
+                    <strong>
+                        ${vehicle.vehicleType || "-"} •
+                        ${vehicle.vehicleColor || "-"}
+                    </strong>
+
                 </div>
 
                 <div class="vehicle-actions">
 
                     <button
-                    type="button"
-                    onclick="openEditVehicleModal(${index})"
-                    aria-label="Edit vehicle">
+                        type="button"
+                        class="vehicle-edit-btn"
+                        onclick="openEditVehicleModal(${index})"
+                        aria-label="Edit vehicle"
+                        title="Edit vehicle">
 
                         <i class="fa-solid fa-pen"></i>
 
                     </button>
 
                     <button
-                    type="button"
-                    onclick="deleteVehicle(${index})"
-                    aria-label="Delete vehicle">
+                        type="button"
+                        class="vehicle-delete-btn"
+                        onclick="deleteVehicle(${index})"
+                        aria-label="Delete vehicle"
+                        title="Delete vehicle">
 
                         <i class="fa-solid fa-trash"></i>
 
@@ -169,6 +195,7 @@ function loadVehicles(owner){
                 </div>
 
             </div>
+
         `;
 
     });
@@ -518,6 +545,222 @@ window.addEventListener("click", function(event){
             modal.classList.remove("show");
 
         }
+
+    });
+
+});
+
+// ==========================================
+// OWNER PROFILE PICTURE
+// ==========================================
+
+function openProfilePicturePicker(){
+
+    const input = document.getElementById("ownerProfileInput");
+
+    if(input){
+        input.click();
+    }
+
+}
+
+function loadOwnerProfilePicture(profilePicture){
+
+    const image = document.getElementById("ownerProfileImage");
+    const icon = document.getElementById("ownerProfileIcon");
+
+    if(!image || !icon){
+        return;
+    }
+
+    if(profilePicture){
+
+        image.src = profilePicture;
+        image.hidden = false;
+        icon.hidden = true;
+
+    }
+    else{
+
+        image.removeAttribute("src");
+        image.hidden = true;
+        icon.hidden = false;
+
+    }
+
+}
+
+function saveOwnerProfilePicture(profilePicture){
+
+    const owners = getOwners();
+
+    const ownerIndex = owners.findIndex(function(owner){
+        return owner.email === currentOwnerEmail;
+    });
+
+    if(ownerIndex === -1){
+
+        showError(
+            "Owner Not Found",
+            "Unable to update your profile picture."
+        );
+
+        return;
+    }
+
+    owners[ownerIndex].profilePicture = profilePicture;
+
+    saveOwners(owners);
+    loadOwnerProfilePicture(profilePicture);
+
+    showSuccess(
+        "Profile Picture Updated",
+        "Your profile picture has been updated successfully."
+    );
+
+}
+
+function resizeProfilePicture(file){
+
+    return new Promise(function(resolve, reject){
+
+        const reader = new FileReader();
+
+        reader.onload = function(event){
+
+            const temporaryImage = new Image();
+
+            temporaryImage.onload = function(){
+
+                const maximumSize = 500;
+
+                let width = temporaryImage.width;
+                let height = temporaryImage.height;
+
+                if(width > height && width > maximumSize){
+
+                    height = Math.round(
+                        height * maximumSize / width
+                    );
+
+                    width = maximumSize;
+
+                }
+                else if(height > maximumSize){
+
+                    width = Math.round(
+                        width * maximumSize / height
+                    );
+
+                    height = maximumSize;
+
+                }
+
+                const canvas = document.createElement("canvas");
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const context = canvas.getContext("2d");
+
+                context.drawImage(
+                    temporaryImage,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                const resizedImage = canvas.toDataURL(
+                    "image/jpeg",
+                    0.82
+                );
+
+                resolve(resizedImage);
+
+            };
+
+            temporaryImage.onerror = function(){
+                reject(new Error("Invalid image file."));
+            };
+
+            temporaryImage.src = event.target.result;
+
+        };
+
+        reader.onerror = function(){
+            reject(new Error("Unable to read the selected file."));
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const profileInput =
+        document.getElementById("ownerProfileInput");
+
+    if(!profileInput){
+        return;
+    }
+
+    profileInput.addEventListener("change", async function(){
+
+        const file = this.files[0];
+
+        if(!file){
+            return;
+        }
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if(!allowedTypes.includes(file.type)){
+
+            showError(
+                "Invalid Image",
+                "Please select a JPG, PNG, or WEBP image."
+            );
+
+            this.value = "";
+            return;
+        }
+
+        if(file.size > 5 * 1024 * 1024){
+
+            showError(
+                "Image Too Large",
+                "Please select an image smaller than 5 MB."
+            );
+
+            this.value = "";
+            return;
+        }
+
+        try{
+
+            const resizedImage =
+                await resizeProfilePicture(file);
+
+            saveOwnerProfilePicture(resizedImage);
+
+        }
+        catch(error){
+
+            showError(
+                "Upload Failed",
+                "The selected image could not be processed."
+            );
+
+        }
+
+        this.value = "";
 
     });
 

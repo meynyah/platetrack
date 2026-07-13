@@ -242,3 +242,318 @@ body.light-mode .vehicle-actions button{
     background:#eef3fb;
     color:#132033;
 }
+
+/* ==========================================
+   OWNER REGISTRATION - VEHICLE LAYOUT
+========================================== */
+
+#vehicleRows{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    margin-bottom:16px;
+}
+
+.vehicle-row{
+    position:relative;
+    margin-bottom:0;
+    padding:20px;
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,45,77,.88),
+            rgba(13,28,51,.82)
+        );
+
+    border:1px solid rgba(255,255,255,.09);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.16),
+        inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.vehicle-row-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+
+    margin-bottom:18px;
+    padding-bottom:16px;
+
+    border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.vehicle-row-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+}
+
+.vehicle-number{
+    width:40px;
+    height:40px;
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:12px;
+
+    background:linear-gradient(
+        135deg,
+        #3d6cff,
+        #5d8bff
+    );
+
+    color:#ffffff;
+    font-size:15px;
+    font-weight:800;
+
+    box-shadow:0 8px 20px rgba(61,108,255,.25);
+}
+
+.vehicle-row-title h4{
+    margin:0 0 4px;
+    color:#ffffff;
+    font-size:15px;
+    font-weight:750;
+}
+
+.vehicle-row-title p{
+    margin:0;
+    color:#8498bd;
+    font-size:12px;
+    line-height:1.4;
+}
+
+.vehicle-fields-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:15px;
+}
+
+.vehicle-fields-grid .input-group{
+    min-width:0;
+    margin:0;
+}
+
+.vehicle-plate-field{
+    grid-column:1 / -1;
+}
+
+.vehicle-input-box{
+    position:relative;
+}
+
+.vehicle-input-box > i{
+    position:absolute;
+    top:50%;
+    left:16px;
+    z-index:2;
+
+    transform:translateY(-50%);
+
+    color:#6f93df;
+    font-size:14px;
+
+    pointer-events:none;
+}
+
+.vehicle-input-box input{
+    width:100%;
+    height:52px;
+
+    padding:0 16px 0 46px;
+
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:13px;
+
+    outline:none;
+
+    background:rgba(5,15,29,.45);
+    color:#ffffff;
+
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+
+    transition:
+        border-color .25s,
+        background .25s,
+        box-shadow .25s;
+}
+
+.vehicle-input-box input::placeholder{
+    color:#637797;
+}
+
+.vehicle-input-box input:focus{
+    border-color:#3d6cff;
+    background:rgba(8,20,38,.75);
+
+    box-shadow:
+        0 0 0 4px rgba(61,108,255,.11);
+}
+
+.remove-vehicle-btn{
+    position:static;
+
+    width:38px;
+    height:38px;
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:1px solid rgba(239,68,68,.18);
+    border-radius:11px;
+
+    background:rgba(239,68,68,.10);
+    color:#f87171;
+
+    cursor:pointer;
+    transition:.25s;
+}
+
+.remove-vehicle-btn:hover{
+    border-color:#ef4444;
+    background:#ef4444;
+    color:#ffffff;
+
+    transform:translateY(-2px);
+}
+
+@media(max-width:560px){
+
+    .vehicle-row{
+        padding:17px;
+    }
+
+    .vehicle-fields-grid{
+        grid-template-columns:1fr;
+    }
+
+    .vehicle-plate-field{
+        grid-column:auto;
+    }
+
+    .vehicle-row-title p{
+        display:none;
+    }
+
+}
+
+body.light-mode .vehicle-row{
+    background:#ffffff;
+    border-color:rgba(36,58,88,.10);
+}
+
+body.light-mode .vehicle-row-title{
+    border-bottom-color:rgba(36,58,88,.09);
+}
+
+body.light-mode .vehicle-row-title h4{
+    color:#14223a;
+}
+
+body.light-mode .vehicle-row-title p{
+    color:#72819c;
+}
+
+body.light-mode .vehicle-input-box input{
+    background:#f5f7fb;
+    border-color:rgba(36,58,88,.11);
+    color:#14223a;
+}
+
+/* ==========================================
+   OWNER PROFILE PICTURE
+========================================== */
+
+.owner-avatar-wrapper{
+    position:relative;
+    width:max-content;
+    flex-shrink:0;
+}
+
+.owner-profile-avatar{
+    position:relative;
+    overflow:hidden;
+}
+
+.owner-profile-avatar img{
+    width:100%;
+    height:100%;
+    display:block;
+
+    object-fit:cover;
+    object-position:center;
+}
+
+.upload-profile-btn{
+    position:absolute;
+    right:-3px;
+    bottom:-3px;
+
+    width:36px;
+    height:36px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+
+    border:3px solid #101d32;
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #3d6cff,
+        #5a86ff
+    );
+
+    color:#ffffff;
+    font-size:13px;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.30),
+        0 5px 15px rgba(61,108,255,.25);
+
+    transition:
+        transform .25s,
+        box-shadow .25s;
+}
+
+.upload-profile-btn:hover{
+    transform:translateY(-2px) scale(1.05);
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.35),
+        0 7px 18px rgba(61,108,255,.35);
+}
+
+.upload-profile-btn:active{
+    transform:scale(.96);
+}
+
+body.light-mode .upload-profile-btn{
+    border-color:#ffffff;
+}
+
+@media(max-width:480px){
+
+    .upload-profile-btn{
+        width:34px;
+        height:34px;
+    }
+
+}
+
