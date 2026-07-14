@@ -35,98 +35,87 @@ const rules = {
 
 let vehicleRowCount = 0;
 
-function createVehicleRowHTML(index){
-
-    const vehicleNumber = index + 1;
+function createVehicleRowHTML(uniqueId){
 
     return `
-        <div class="vehicle-row" data-row="${index}">
+        <div class="vehicle-row" data-row="${uniqueId}">
 
             <div class="vehicle-row-header">
 
-                <div class="vehicle-row-title">
-                    <div class="vehicle-number">
-                        ${vehicleNumber}
-                    </div>
+                <span class="vehicle-row-label">Vehicle</span>
 
-                    <div>
-                        <h4>Vehicle ${vehicleNumber}</h4>
-                        <p>Enter the vehicle registration details.</p>
-                    </div>
-                </div>
+                <button
+                type="button"
+                class="remove-vehicle-btn"
+                onclick="removeVehicleRow(${uniqueId})"
+                aria-label="Remove vehicle">
 
-                ${index > 0 ? `
-                    <button
-                        type="button"
-                        class="remove-vehicle-btn"
-                        onclick="removeVehicleRow(${index})"
-                        aria-label="Remove vehicle">
+                    <i class="fa-solid fa-trash"></i>
+                    Remove
 
-                        <i class="fa-solid fa-trash"></i>
-
-                    </button>
-                ` : ""}
+                </button>
 
             </div>
 
-            <div class="vehicle-fields-grid">
+            <div class="vehicle-row-grid">
 
-                <div class="input-group vehicle-plate-field">
-                    <label>
-                        Plate Number
-                    </label>
-
-                    <div class="vehicle-input-box">
-                        <i class="fa-solid fa-id-card"></i>
-
-                        <input
-                            type="text"
-                            class="vehiclePlate"
-                            data-row="${index}"
-                            placeholder="e.g. ABC 1234"
-                            maxlength="12"
-                            required>
-                    </div>
+                <div class="input-group">
+                    <label>Plate Number</label>
+                    <input
+                    type="text"
+                    class="vehiclePlate"
+                    data-row="${uniqueId}"
+                    placeholder="e.g. ABC 1234"
+                    required>
                 </div>
 
                 <div class="input-group">
-                    <label>
-                        Vehicle Type / Model
-                    </label>
-
-                    <div class="vehicle-input-box">
-                        <i class="fa-solid fa-car-side"></i>
-
-                        <input
-                            type="text"
-                            class="vehicleType"
-                            data-row="${index}"
-                            placeholder="e.g. Toyota Vios"
-                            required>
-                    </div>
+                    <label>Vehicle Type</label>
+                    <input
+                    type="text"
+                    class="vehicleType"
+                    data-row="${uniqueId}"
+                    placeholder="e.g. Toyota Vios"
+                    required>
                 </div>
 
                 <div class="input-group">
-                    <label>
-                        Vehicle Color
-                    </label>
-
-                    <div class="vehicle-input-box">
-                        <i class="fa-solid fa-palette"></i>
-
-                        <input
-                            type="text"
-                            class="vehicleColor"
-                            data-row="${index}"
-                            placeholder="e.g. White"
-                            required>
-                    </div>
+                    <label>Vehicle Color</label>
+                    <input
+                    type="text"
+                    class="vehicleColor"
+                    data-row="${uniqueId}"
+                    placeholder="e.g. White"
+                    required>
                 </div>
 
             </div>
 
         </div>
     `;
+
+}
+
+function renumberVehicleRows(){
+
+    const rows = document.querySelectorAll(".vehicle-row");
+
+    rows.forEach(function(row, position){
+
+        const label = row.querySelector(".vehicle-row-label");
+
+        if(label){
+            label.textContent = "Vehicle " + (position + 1);
+        }
+
+        const removeBtn = row.querySelector(".remove-vehicle-btn");
+
+        if(removeBtn){
+            removeBtn.style.display = position === 0 ? "none" : "flex";
+        }
+
+    });
+
 }
 
 function addVehicleRow(){
@@ -137,15 +126,19 @@ function addVehicleRow(){
 
     vehicleRowCount++;
 
+    renumberVehicleRows();
+
 }
 
-function removeVehicleRow(index){
+function removeVehicleRow(uniqueId){
 
-    const row = document.querySelector(`.vehicle-row[data-row="${index}"]`);
+    const row = document.querySelector(`.vehicle-row[data-row="${uniqueId}"]`);
 
     if(row){
         row.remove();
     }
+
+    renumberVehicleRows();
 
 }
 

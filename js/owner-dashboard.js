@@ -141,6 +141,23 @@ function loadOwnerInfo(owner){
     document.getElementById("ownerName").textContent = owner.fullName;
     document.getElementById("ownerEmail").textContent = owner.email;
 
+    const img = document.getElementById("dashboardAvatarImage");
+    const icon = document.getElementById("dashboardAvatarIcon");
+
+    if(owner.profilePicture){
+
+        img.src = owner.profilePicture;
+        img.style.display = "block";
+        icon.style.display = "none";
+
+    }
+    else{
+
+        img.style.display = "none";
+        icon.style.display = "block";
+
+    }
+
 }
 
 function loadPlates(owner){
