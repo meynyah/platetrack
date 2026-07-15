@@ -42,7 +42,13 @@ function createVehicleRowHTML(uniqueId){
 
             <div class="vehicle-row-header">
 
-                <span class="vehicle-row-label">Vehicle</span>
+                <div class="vehicle-row-title">
+                    <span class="vehicle-number"><i class="fa-solid fa-car"></i></span>
+                    <div>
+                        <span class="vehicle-row-label">Vehicle</span>
+                        <small>Owner's registered vehicle</small>
+                    </div>
+                </div>
 
                 <button
                 type="button"
@@ -59,34 +65,45 @@ function createVehicleRowHTML(uniqueId){
 
             <div class="vehicle-row-grid">
 
-                <div class="input-group">
+                <div class="input-group vehicle-plate-field">
                     <label>Plate Number</label>
-                    <input
-                    type="text"
-                    class="vehiclePlate"
-                    data-row="${uniqueId}"
-                    placeholder="e.g. ABC 1234"
-                    required>
+                    <div class="input-box">
+                        <i class="fa-solid fa-id-card input-icon"></i>
+                        <input
+                        type="text"
+                        class="vehiclePlate"
+                        data-row="${uniqueId}"
+                        maxlength="10"
+                        autocomplete="off"
+                        placeholder="e.g. ABC 1234"
+                        required>
+                    </div>
                 </div>
 
                 <div class="input-group">
                     <label>Vehicle Type</label>
-                    <input
-                    type="text"
-                    class="vehicleType"
-                    data-row="${uniqueId}"
-                    placeholder="e.g. Toyota Vios"
-                    required>
+                    <div class="input-box">
+                        <i class="fa-solid fa-car-side input-icon"></i>
+                        <input
+                        type="text"
+                        class="vehicleType"
+                        data-row="${uniqueId}"
+                        placeholder="e.g. Toyota Vios"
+                        required>
+                    </div>
                 </div>
 
                 <div class="input-group">
                     <label>Vehicle Color</label>
-                    <input
-                    type="text"
-                    class="vehicleColor"
-                    data-row="${uniqueId}"
-                    placeholder="e.g. White"
-                    required>
+                    <div class="input-box">
+                        <i class="fa-solid fa-palette input-icon"></i>
+                        <input
+                        type="text"
+                        class="vehicleColor"
+                        data-row="${uniqueId}"
+                        placeholder="e.g. White"
+                        required>
+                    </div>
                 </div>
 
             </div>
@@ -106,6 +123,11 @@ function renumberVehicleRows(){
 
         if(label){
             label.textContent = "Vehicle " + (position + 1);
+        }
+
+        const number = row.querySelector(".vehicle-number");
+        if(number){
+            number.setAttribute("aria-label", "Vehicle " + (position + 1));
         }
 
         const removeBtn = row.querySelector(".remove-vehicle-btn");

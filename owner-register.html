@@ -167,14 +167,15 @@
 
                 </div>
 
-                <div class="card-title">
-
-                    <i class="fa-solid fa-car-side"></i>
-                    <span>Registered Vehicles</span>
-
+                <div class="vehicle-section-heading">
+                    <div class="card-title">
+                        <i class="fa-solid fa-car-side"></i>
+                        <span>Registered Vehicles</span>
+                    </div>
+                    <p>Add the vehicle details connected to this owner account.</p>
                 </div>
 
-                <div id="vehicleRows">
+                <div id="vehicleRows" class="vehicle-rows" aria-live="polite">
 
                     <!-- Vehicle rows are injected here by JS -->
 
@@ -227,7 +228,7 @@
                         <input
                         id="email"
                         type="email"
-                        placeholder="you@email.com"
+                        placeholder="Enter your email address"
                         required>
                     
                     </div>

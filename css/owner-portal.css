@@ -129,17 +129,40 @@ body.light-mode .plate-chip i{
     font-size:18px;
 }
 
+.vehicle-section-heading{
+    margin-top:30px;
+    margin-bottom:16px;
+}
+
+.vehicle-section-heading .card-title{
+    margin:0 0 6px;
+}
+
+.vehicle-section-heading > p{
+    margin:0;
+    color:#9fb2d8;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.vehicle-rows{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
 /* ==========================================
    VEHICLE ROWS
    (owner-register.html - multi-vehicle registration)
 ========================================== */
 
 .vehicle-row{
-    margin-bottom:18px;
+    margin:0;
     padding:18px;
     border-radius:16px;
-    background:rgba(21,39,66,.55);
-    border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(145deg,rgba(27,47,77,.82),rgba(21,39,66,.62));
+    border:1px solid rgba(130,170,255,.16);
+    box-shadow:0 10px 24px rgba(5,14,31,.14);
 }
 
 .vehicle-row-header{
@@ -152,16 +175,45 @@ body.light-mode .plate-chip i{
 }
 
 .vehicle-row-label{
+    display:block;
     font-weight:800;
     font-size:14px;
-    color:#82aaff;
+    color:#ffffff;
     letter-spacing:.3px;
+}
+
+.vehicle-row-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.vehicle-row-title small{
+    display:block;
+    margin-top:2px;
+    color:#9fb2d8;
+    font-size:11px;
+}
+
+.vehicle-number{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    display:grid;
+    place-items:center;
+    flex-shrink:0;
+    color:#a9c3ff;
+    background:rgba(61,108,255,.16);
 }
 
 .vehicle-row-grid{
     display:grid;
-    grid-template-columns:1fr 1fr 1fr;
+    grid-template-columns:1fr 1fr;
     gap:14px;
+}
+
+.vehicle-plate-field{
+    grid-column:1 / -1;
 }
 
 .vehicle-row-grid .input-group{
@@ -190,6 +242,7 @@ body.light-mode .plate-chip i{
 
 .add-vehicle-btn{
     width:100%;
+    margin-top:14px;
     margin-bottom:22px;
     padding:14px;
     border:1px dashed rgba(61,108,255,.45);
@@ -217,6 +270,26 @@ body.light-mode .plate-chip i{
         grid-template-columns:1fr;
     }
 
+    .vehicle-plate-field{
+        grid-column:auto;
+    }
+
+    .vehicle-row{
+        padding:15px;
+    }
+
+    .remove-vehicle-btn{
+        width:34px;
+        height:34px;
+        padding:0;
+        justify-content:center;
+        font-size:0;
+    }
+
+    .remove-vehicle-btn i{
+        font-size:13px;
+    }
+
 }
 
 body.light-mode .vehicle-row{
@@ -226,6 +299,15 @@ body.light-mode .vehicle-row{
 
 body.light-mode .vehicle-row-header{
     border-color:rgba(36,58,88,.10);
+}
+
+body.light-mode .vehicle-row-label{
+    color:#132033;
+}
+
+body.light-mode .vehicle-row-title small,
+body.light-mode .vehicle-section-heading > p{
+    color:#60708b;
 }
 
 /* ==========================================
