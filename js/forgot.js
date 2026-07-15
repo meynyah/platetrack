@@ -51,6 +51,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+        const enforcers = JSON.parse(localStorage.getItem("plateTrackEnforcers")) || [];
+        const matchedEnforcer = enforcers.find(function(enforcer){
+            return enforcer.email && enforcer.email.toLowerCase() === emailValue.toLowerCase();
+        });
+        if(!matchedEnforcer){
+            showError("Account Not Found", "No traffic enforcer account was found for this email address.");
+            return;
+        }
+        localStorage.setItem("resetEmail", matchedEnforcer.email);
+
         // ===============================
         // Loading State
         // ===============================
@@ -63,8 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <i class="fa-solid fa-spinner fa-spin"></i>
             Sending Verification Code...
         `;
-
-        // Simulated request for the static prototype.
 
         setTimeout(() => {
 

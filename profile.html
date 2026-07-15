@@ -74,9 +74,12 @@ PROFILE HEADER
 
 <section class="profile-header">
 
-<div class="avatar">
+<div class="avatar" id="avatarWrapper">
 
-<i class="fa-solid fa-user-shield"></i>
+<img id="avatarImage" alt="Profile picture">
+<i class="fa-solid fa-user-shield" id="avatarIcon"></i>
+<label class="avatar-upload-btn" for="avatarUploadInput" aria-label="Upload profile picture"><i class="fa-solid fa-camera"></i></label>
+<input id="avatarUploadInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
 
 </div>
 
@@ -373,106 +376,6 @@ Application information and version.
 <i class="fa-solid fa-chevron-right"></i>
 
 </button>
-
-</div>
-
-</section>
-
-<!-- ==========================
-SYSTEM INFORMATION
-========================== -->
-
-<section class="profile-card">
-
-<div class="section-header">
-
-<h2>
-
-System Information
-
-</h2>
-
-</div>
-
-<div class="info-list">
-
-<div class="info-item">
-
-<div class="info-icon">
-
-<i class="fa-solid fa-mobile-screen-button"></i>
-
-</div>
-
-<div class="info-content">
-
-<span>
-
-Application
-
-</span>
-
-<strong>
-
-PlateTrack Mobile
-
-</strong>
-
-</div>
-
-</div>
-
-<div class="info-item">
-
-<div class="info-icon">
-
-<i class="fa-solid fa-code-branch"></i>
-
-</div>
-
-<div class="info-content">
-
-<span>
-
-Version
-
-</span>
-
-<strong>
-
-Version 1.0.0
-
-</strong>
-
-</div>
-
-</div>
-
-<div class="info-item">
-
-<div class="info-icon">
-
-<i class="fa-solid fa-calendar-check"></i>
-
-</div>
-
-<div class="info-content">
-
-<span>
-
-Last Updated
-
-</span>
-
-<strong>
-
-July 2026
-
-</strong>
-
-</div>
-
-</div>
 
 </div>
 

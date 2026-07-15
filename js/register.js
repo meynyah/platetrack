@@ -305,6 +305,15 @@ registerBtn.addEventListener("click", function(){
         return;
     }
 
+    const normalizedEmail = email.toLowerCase();
+    const enforcers = JSON.parse(localStorage.getItem("plateTrackEnforcers")) || [];
+    if(enforcers.some(function(enforcer){
+        return enforcer.email && enforcer.email.toLowerCase() === normalizedEmail;
+    })){
+        showError("Account Already Exists", "An enforcer account with this email address already exists.");
+        return;
+    }
+
     registerBtn.disabled = true;
     registerBtn.classList.add("loading");
 
@@ -324,6 +333,19 @@ registerBtn.addEventListener("click", function(){
         `;
 
         setTimeout(() => {
+
+            enforcers.push({
+                fullName: document.getElementById("firstName").value.trim() + " " + document.getElementById("lastName").value.trim(),
+                badgeNumber: document.getElementById("badgeNumber").value.trim(),
+                email: normalizedEmail,
+                mobile: mobile,
+                assignedArea: "Antipolo City",
+                station: "Antipolo Traffic Management Office",
+                password: password.value,
+                status: "pending",
+                dateRegistered: new Date().toISOString()
+            });
+            localStorage.setItem("plateTrackEnforcers", JSON.stringify(enforcers));
 
             showSuccess(
                 "Registration Submitted",

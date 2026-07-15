@@ -4,6 +4,16 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    const resetEmail = localStorage.getItem("resetEmail");
+    const enforcers = JSON.parse(localStorage.getItem("plateTrackEnforcers")) || [];
+    const enforcerIndex = enforcers.findIndex(function(enforcer){
+        return resetEmail && enforcer.email && enforcer.email.toLowerCase() === resetEmail.toLowerCase();
+    });
+    if(enforcerIndex === -1){
+        window.location.href = "forgot-password.html";
+        return;
+    }
+
     const form = document.getElementById("resetForm");
 
     const newPassword = document.getElementById("newPassword");
@@ -269,6 +279,10 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
 
             setTimeout(() => {
+
+                enforcers[enforcerIndex].password = password;
+                localStorage.setItem("plateTrackEnforcers", JSON.stringify(enforcers));
+                localStorage.removeItem("resetEmail");
 
                 showSuccess(
                     "Password Updated",

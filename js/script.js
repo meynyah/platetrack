@@ -86,6 +86,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+        let enforcers;
+        try{
+            const stored = JSON.parse(localStorage.getItem("plateTrackEnforcers"));
+            enforcers = Array.isArray(stored) ? stored : [];
+        }catch(error){ enforcers = []; }
+        const matchedEnforcer = enforcers.find(function(enforcer){
+            return enforcer.email && enforcer.email.toLowerCase() === emailValue.toLowerCase();
+        });
+        if(!matchedEnforcer){
+            showError("Account Not Found", "No traffic enforcer account was found for this email address.");
+            return;
+        }
+        const status = (matchedEnforcer.status || "pending").toLowerCase();
+        if(status !== "approved" && status !== "active"){
+            showError("Account Pending Approval", "Your enforcer account must be approved before you can sign in.");
+            return;
+        }
+        if(matchedEnforcer.password !== passwordValue){
+            showError("Incorrect Password", "The password you entered is incorrect.");
+            return;
+        }
+
         // ===============================
         // Loading State
         // ===============================
@@ -116,8 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 showSuccess(
                     "Login Successful",
-                    "Welcome back, Traffic Enforcer. Redirecting you to the dashboard.",
+                    `Welcome back, ${matchedEnforcer.fullName}. Redirecting you to the dashboard.`,
                     () => {
+                        localStorage.setItem("plateTrackEnforcerSession", matchedEnforcer.email);
                         window.location.href = "enforcer-dashboard.html";
                     }
                 );
