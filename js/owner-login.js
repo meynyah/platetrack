@@ -10,10 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const togglePassword = document.getElementById("togglePassword");
     const loginButton = document.getElementById("loginButton");
 
-    // ===============================
-    // Show / Hide Password
-    // ===============================
-
     if(togglePassword && password){
 
         togglePassword.addEventListener("click", () => {
@@ -21,38 +17,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const icon = togglePassword.querySelector("i");
 
             if(password.type === "password"){
-
                 password.type = "text";
                 icon.className = "fa-solid fa-eye-slash";
                 togglePassword.setAttribute("aria-label", "Hide Password");
-
             }else{
-
                 password.type = "password";
                 icon.className = "fa-solid fa-eye";
                 togglePassword.setAttribute("aria-label", "Show Password");
-
             }
 
         });
 
     }
 
-    // ===============================
-    // Get Registered Owners
-    // ===============================
-
-    function getOwners(){
-
-        return JSON.parse(localStorage.getItem("plateTrackOwners")) || [];
-
-    }
-
-    // ===============================
-    // Login Form Submit
-    // ===============================
-
-    loginForm.addEventListener("submit", (e) => {
+    loginForm.addEventListener("submit", async (e) => {
 
         e.preventDefault();
 
@@ -60,91 +38,57 @@ document.addEventListener("DOMContentLoaded", () => {
         const passwordValue = password.value.trim();
 
         if(emailValue === ""){
-
-            showError(
-                "Email Required",
-                "Please enter your registered email address."
-            );
-
+            showError("Email Required", "Please enter your registered email address.");
             return;
-
         }
 
         if(!emailValue.includes("@") || !emailValue.includes(".")){
-
-            showError(
-                "Invalid Email",
-                "Please enter a valid email address."
-            );
-
+            showError("Invalid Email", "Please enter a valid email address.");
             return;
-
         }
 
         if(passwordValue === ""){
-
-            showError(
-                "Password Required",
-                "Please enter your account password."
-            );
-
+            showError("Password Required", "Please enter your account password.");
             return;
-
         }
-
-        const owners = getOwners();
-
-        const matchedOwner = owners.find(function(owner){
-            return owner.email.toLowerCase() === emailValue;
-        });
-
-        if(!matchedOwner){
-
-            showError(
-                "Account Not Found",
-                "No vehicle owner account was found for this email address. Please register first."
-            );
-
-            return;
-
-        }
-
-        if(matchedOwner.password !== passwordValue){
-
-            showError(
-                "Incorrect Password",
-                "The password you entered is incorrect. Please try again."
-            );
-
-            return;
-
-        }
-
-        // ===============================
-        // Loading State
-        // ===============================
 
         loginButton.disabled = true;
         loginButton.classList.add("loading");
+        loginButton.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Signing in...`;
 
-        loginButton.innerHTML = `
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Signing in...
-        `;
+        try {
 
-        setTimeout(() => {
+            const response = await fetch(`${API_BASE_URL}/api/auth/owner/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emailValue, password: passwordValue })
+            });
+
+            const data = await response.json();
+
+            if(!response.ok){
+                loginButton.disabled = false;
+                loginButton.classList.remove("loading");
+                loginButton.innerHTML = "Sign in to My Account";
+
+                let errorTitle = "Login Failed";
+                if(response.status === 401) errorTitle = "Invalid Credentials";
+                if(response.status === 403) errorTitle = "Account Not Approved";
+
+                showError(errorTitle, data.message || "Something went wrong. Please try again.");
+                return;
+            }
+
+            const matchedOwner = data.user;
 
             loginButton.classList.remove("loading");
             loginButton.classList.add("success");
-
-            loginButton.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                Login Successful
-            `;
+            loginButton.innerHTML = `<i class="fa-solid fa-circle-check"></i> Login Successful`;
 
             setTimeout(() => {
 
-                localStorage.setItem("plateTrackOwnerSession", matchedOwner.email);
+                localStorage.setItem("plateTrackToken", data.token);
+                localStorage.setItem("plateTrackOwnerSession", JSON.stringify(matchedOwner));
 
                 showSuccess(
                     "Login Successful",
@@ -160,7 +104,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }, 850);
 
-        }, 1200);
+        } catch (error) {
+            loginButton.disabled = false;
+            loginButton.classList.remove("loading");
+            loginButton.innerHTML = "Sign in to My Account";
+            showError("Connection Error", "Unable to reach the server. Please try again.");
+        }
 
     });
 

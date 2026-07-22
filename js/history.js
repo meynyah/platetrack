@@ -1,56 +1,105 @@
 // ==========================================
 // PLATETRACK
-// HISTORY PAGE
+// HISTORY PAGE (My Reports — backend-connected)
 // ==========================================
 
-document.addEventListener("DOMContentLoaded",function(){
+const API_BASE = "http://localhost:5000/api";
 
-    loadHistory();
+let allViolations = [];
+
+document.addEventListener("DOMContentLoaded",async function(){
+
+    const token = getEnforcerToken();
+
+    if(!token){
+        window.location.href = "enforcer-login.html";
+        return;
+    }
+
+    await loadHistory(token);
 
 });
 
 // ==========================================
-// GET HISTORY (with safe parsing)
+// ENFORCER AUTH TOKEN
 // ==========================================
 
-function getHistoryRecords(){
+function getEnforcerToken(){
 
-    try{
+    return (
+        localStorage.getItem("plateTrackToken") ||
+        sessionStorage.getItem("plateTrackToken")
+    );
 
-        const data = localStorage.getItem("plateTrackHistory");
+}
 
-        if(!data){
-            return [];
-        }
+function clearEnforcerSession(){
 
-        const parsed = JSON.parse(data);
-
-        return Array.isArray(parsed) ? parsed : [];
-
-    }
-    catch(error){
-
-        console.error("Unable to read violation history:",error);
-
-        return [];
-
-    }
+    localStorage.removeItem("plateTrackToken");
+    localStorage.removeItem("plateTrackEnforcer");
+    sessionStorage.removeItem("plateTrackToken");
+    sessionStorage.removeItem("plateTrackEnforcer");
 
 }
 
 // ==========================================
-// LOAD HISTORY
+// LOAD HISTORY (from backend)
 // ==========================================
 
-function loadHistory(data = null){
+async function loadHistory(token, data = null){
 
-    const history = data || getHistoryRecords();
+    const historyList = document.getElementById("historyList");
+    const emptyState = document.getElementById("emptyState");
 
-    const historyList =
-    document.getElementById("historyList");
+    if(data === null){
 
-    const emptyState =
-    document.getElementById("emptyState");
+        try{
+
+            const response = await fetch(
+                API_BASE + "/enforcer/violations/mine",
+                {
+                    headers:{
+                        "Authorization":`Bearer ${token}`
+                    }
+                }
+            );
+
+            if(response.status === 401 || response.status === 403){
+
+                clearEnforcerSession();
+                window.location.href = "enforcer-login.html";
+                return;
+
+            }
+
+            const violations = await response.json();
+
+            if(!response.ok){
+                throw new Error(violations.message || "Failed to load your reports.");
+            }
+
+            allViolations = Array.isArray(violations) ? violations : [];
+
+        }
+        catch(error){
+
+            console.error("Unable to load violation history:", error);
+
+            historyList.innerHTML = "";
+
+            emptyState.style.display = "flex";
+            emptyState.querySelector("h3") &&
+                (emptyState.querySelector("h3").textContent = "Unable to Load Reports");
+            emptyState.querySelector("p") &&
+                (emptyState.querySelector("p").textContent = error.message || "Please refresh the page.");
+
+            return;
+
+        }
+
+    }
+
+    const history = data !== null ? data : allViolations;
 
     historyList.innerHTML = "";
 
@@ -59,12 +108,21 @@ function loadHistory(data = null){
         emptyState.style.display = "flex";
 
         return;
-
     }
 
     emptyState.style.display = "none";
 
     history.forEach(function(item){
+
+        const date = item.dateTime
+            ? new Date(item.dateTime).toLocaleString("en-US",{
+                month:"short",
+                day:"numeric",
+                year:"numeric",
+                hour:"numeric",
+                minute:"2-digit"
+            })
+            : "Recent";
 
         historyList.innerHTML += `
             <div class="history-card">
@@ -73,16 +131,16 @@ function loadHistory(data = null){
 
                     <div>
                         <div class="record-id">
-                            ${item.recordId || "N/A"}
+                            ${escapeHtml((item._id || "").slice(-8).toUpperCase() || "N/A")}
                         </div>
 
                         <div class="plate-number">
-                            ${item.plateNumber || "Unknown Plate"}
+                            ${escapeHtml(item.plateNumber || "Unknown Plate")}
                         </div>
                     </div>
 
                     <div class="violation-badge">
-                        ${item.violation || "Violation"}
+                        ${escapeHtml(item.violationType || "Violation")}
                     </div>
 
                 </div>
@@ -90,23 +148,18 @@ function loadHistory(data = null){
                 <div class="history-details">
 
                     <div class="detail-row">
-                        <span class="detail-label">Vehicle</span>
-                        <span class="detail-value">${item.vehicleType || "-"}</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Color</span>
-                        <span class="detail-value">${item.vehicleColor || "-"}</span>
-                    </div>
-
-                    <div class="detail-row">
                         <span class="detail-label">Location</span>
-                        <span class="detail-value">${item.location || "-"}</span>
+                        <span class="detail-value">${escapeHtml(item.location || "-")}</span>
                     </div>
 
                     <div class="detail-row">
                         <span class="detail-label">Date</span>
-                        <span class="detail-value">${item.date || "-"}</span>
+                        <span class="detail-value">${escapeHtml(date)}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">${escapeHtml(item.status || "pending")}</span>
                     </div>
 
                 </div>
@@ -116,20 +169,10 @@ function loadHistory(data = null){
                     <button
                     class="view-btn"
                     type="button"
-                    onclick="viewRecord('${item.recordId}')">
+                    onclick="viewRecord('${item._id}')">
 
                         <i class="fa-solid fa-eye"></i>
                         View
-
-                    </button>
-
-                    <button
-                    class="delete-btn"
-                    type="button"
-                    onclick="deleteRecord('${item.recordId}')">
-
-                        <i class="fa-solid fa-trash"></i>
-                        Delete
 
                     </button>
 
@@ -160,53 +203,37 @@ function applyFilters(){
     .getElementById("violationFilter")
     .value;
 
-    const history = getHistoryRecords();
+    const filtered = allViolations.filter(function(item){
 
-    const filteredHistory = history.filter(function(item){
-
-        const plate =
-        (item.plateNumber || "").toLowerCase();
-
-        const vehicle =
-        (item.vehicleType || "").toLowerCase();
-
-        const location =
-        (item.location || "").toLowerCase();
-
-        const recordId =
-        (item.recordId || "").toLowerCase();
-
-        const violation =
-        item.violation || "";
+        const plate = (item.plateNumber || "").toLowerCase();
+        const location = (item.location || "").toLowerCase();
 
         const matchKeyword =
         plate.includes(keyword) ||
-        vehicle.includes(keyword) ||
-        location.includes(keyword) ||
-        recordId.includes(keyword);
+        location.includes(keyword);
 
         const matchViolation =
         filter === "" ||
-        violation === filter;
+        item.violationType === filter;
 
         return matchKeyword && matchViolation;
 
     });
 
-    loadHistory(filteredHistory);
+    const token = getEnforcerToken();
+
+    loadHistory(token, filtered);
 
 }
 
 // ==========================================
-// VIEW RECORD (looked up by recordId)
+// VIEW RECORD (looked up by backend _id)
 // ==========================================
 
-function viewRecord(recordId){
+function viewRecord(violationId){
 
-    const history = getHistoryRecords();
-
-    const item = history.find(function(record){
-        return record.recordId === recordId;
+    const item = allViolations.find(function(record){
+        return record._id === violationId;
     });
 
     if(!item){
@@ -216,11 +243,11 @@ function viewRecord(recordId){
     const imageBox =
     document.getElementById("capturedDetailImage");
 
-    if(item.capturedImage){
+    if(item.photoUrl){
 
         imageBox.innerHTML = `
             <img
-            src="${item.capturedImage}"
+            src="${item.photoUrl}"
             alt="Captured vehicle evidence">
         `;
 
@@ -236,26 +263,34 @@ function viewRecord(recordId){
 
     }
 
+    const date = item.dateTime
+        ? new Date(item.dateTime).toLocaleString("en-US",{
+            month:"long",
+            day:"numeric",
+            year:"numeric",
+            hour:"numeric",
+            minute:"2-digit"
+        })
+        : "-";
+
     document.getElementById("detailRecordId").textContent =
-    item.recordId || "N/A";
+    (item._id || "").slice(-8).toUpperCase() || "N/A";
 
     document.getElementById("detailPlate").textContent =
     item.plateNumber || "-";
 
-    document.getElementById("detailVehicle").textContent =
-    item.vehicleType || "-";
+    document.getElementById("detailVehicle").textContent = "-";
 
-    document.getElementById("detailColor").textContent =
-    item.vehicleColor || "-";
+    document.getElementById("detailColor").textContent = "-";
 
     document.getElementById("detailViolation").textContent =
-    item.violation || "-";
+    item.violationType || "-";
 
     document.getElementById("detailLocation").textContent =
     item.location || "-";
 
     document.getElementById("detailDate").textContent =
-    item.date || "-";
+    date;
 
     document.getElementById("detailNotes").textContent =
     item.notes && item.notes.trim() !== ""
@@ -279,56 +314,6 @@ function closeDetailsModal(){
 }
 
 // ==========================================
-// DELETE RECORD (looked up by recordId)
-// ==========================================
-
-function deleteRecord(recordId){
-
-    showConfirm(
-
-        "Delete Record",
-
-        "Are you sure you want to delete this violation record?",
-
-        function(){
-
-            let history = getHistoryRecords();
-
-            const index = history.findIndex(function(record){
-                return record.recordId === recordId;
-            });
-
-            if(index === -1){
-                return;
-            }
-
-            history.splice(index,1);
-
-            localStorage.setItem(
-
-                "plateTrackHistory",
-
-                JSON.stringify(history)
-
-            );
-
-            loadHistory();
-
-            showSuccess(
-
-                "Deleted",
-
-                "Violation record deleted successfully."
-
-            );
-
-        }
-
-    );
-
-}
-
-// ==========================================
 // CLOSE MODAL WHEN CLICKING OUTSIDE
 // ==========================================
 
@@ -344,3 +329,16 @@ window.addEventListener("click",function(event){
     }
 
 });
+
+// ==========================================
+// SAFE HTML
+// ==========================================
+
+function escapeHtml(value){
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}

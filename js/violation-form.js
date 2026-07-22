@@ -3,7 +3,24 @@
 // UNIFIED VIOLATION FORM
 // ==========================================
 
+const API_BASE = "http://localhost:5000/api";
+
 let isCameraMode = false;
+
+// ==========================================
+// ENFORCER AUTH TOKEN
+// (login stores it in localStorage if "remember me"
+// was checked, otherwise in sessionStorage)
+// ==========================================
+
+function getEnforcerToken(){
+
+    return (
+        localStorage.getItem("plateTrackToken") ||
+        sessionStorage.getItem("plateTrackToken")
+    );
+
+}
 
 // ==========================================
 // EVIDENCE CAPTURE STATE
@@ -364,10 +381,27 @@ function validateForm(){
 // SAVE VIOLATION
 // ==========================================
 
-function saveViolation(){
+async function saveViolation(){
 
     if(!validateForm()){
         return;
+    }
+
+    const token = getEnforcerToken();
+
+    if(!token){
+
+        showError(
+            "Session Expired",
+            "Please log in again before submitting a violation report."
+        );
+
+        setTimeout(function(){
+            window.location.href = "enforcer-login.html";
+        },1500);
+
+        return;
+
     }
 
     let violation = getCleanValue("violationType");
@@ -376,12 +410,123 @@ function saveViolation(){
         violation = getCleanValue("otherViolation");
     }
 
+    const saveButton = document.querySelector(".save-btn");
+    const originalButtonHtml = saveButton ? saveButton.innerHTML : "";
+
+    if(saveButton){
+
+        saveButton.disabled = true;
+
+        saveButton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Submitting...
+        `;
+
+    }
+
+    // This is what actually reaches the shared database (and from there,
+    // the vehicle owner's and admin's dashboards). Everything below that
+    // writes to localStorage is only a local copy for this device's
+    // "My Reports" / recent-detections views.
+    const backendPayload = {
+
+        plateNumber:getCleanValue("plateNumber").toUpperCase(),
+
+        violationType:violation,
+
+        location:getCleanValue("location"),
+
+        dateTime:new Date().toISOString(),
+
+        photoUrl:capturedEvidenceImage || null,
+
+        notes:[
+            getCleanValue("officerNotes"),
+            `Vehicle: ${getCleanValue("vehicleType")} (${getCleanValue("vehicleColor")})`
+        ].filter(Boolean).join(" | ")
+
+    };
+
+    let submittedViolation;
+
+    try{
+
+        const response = await fetch(
+            API_BASE + "/enforcer/violations",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":`Bearer ${token}`
+                },
+
+                body:JSON.stringify(backendPayload)
+            }
+        );
+
+        const data = await response.json();
+
+        if(response.status === 401 || response.status === 403){
+
+            localStorage.removeItem("plateTrackToken");
+            localStorage.removeItem("plateTrackEnforcer");
+            sessionStorage.removeItem("plateTrackToken");
+            sessionStorage.removeItem("plateTrackEnforcer");
+
+            showError(
+                "Session Expired",
+                "Please log in again before submitting a violation report."
+            );
+
+            setTimeout(function(){
+                window.location.href = "enforcer-login.html";
+            },1500);
+
+            return;
+
+        }
+
+        if(!response.ok){
+
+            throw new Error(
+                data.message || "Failed to submit the violation report."
+            );
+
+        }
+
+        submittedViolation = data.violation;
+
+    }
+    catch(error){
+
+        console.error("Unable to submit violation report:", error);
+
+        if(saveButton){
+
+            saveButton.disabled = false;
+            saveButton.innerHTML = originalButtonHtml;
+
+        }
+
+        showError(
+            "Submission Failed",
+            error.message ||
+            "Unable to reach the PlateTrack server. Please check your connection and try again."
+        );
+
+        return;
+
+    }
+
+    // Local copy, used by this device's recent-detections / history views.
     let history =
     JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
 
     const year = new Date().getFullYear();
 
     const recordId =
+    (submittedViolation && submittedViolation._id) ||
     `PT-${year}-${String(history.length + 1).padStart(6,"0")}`;
 
     const violationData = {
@@ -426,8 +571,10 @@ function saveViolation(){
 
         // Storage quota exceeded is a real risk once photos are attached.
         // Retry once without the photo so the violation record itself isn't lost.
+        // The report has already been submitted to the server successfully at
+        // this point, so this only affects the local recent-detections view.
 
-        console.error("Unable to save with photo, retrying without it:", error);
+        console.error("Unable to save local copy with photo, retrying without it:", error);
 
         violationData.capturedImage = "";
 
@@ -440,20 +587,10 @@ function saveViolation(){
                 JSON.stringify(history)
             );
 
-            showWarning(
-                "Photo Not Saved",
-                "The violation was saved, but the photo was too large to store and was not attached."
-            );
-
         }
         catch(retryError){
 
-            showError(
-                "Save Failed",
-                "Unable to save this violation record. Your browser storage may be full."
-            );
-
-            return;
+            console.error("Unable to save local copy of violation:", retryError);
 
         }
 
@@ -466,7 +603,7 @@ function saveViolation(){
 
     showSuccess(
         "Violation Saved",
-        "The violation record has been saved successfully."
+        "The violation record has been submitted successfully."
     );
 
     setTimeout(function(){

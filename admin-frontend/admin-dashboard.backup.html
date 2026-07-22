@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PlateTrack Administrator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand-mark"><span class="dot"></span>PLATETRACK</div>
+
+    <div class="nav-group">
+      <div class="nav-label">Overview</div>
+      <button class="nav-item active" data-view="overview">Dashboard</button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Account Review</div>
+      <button class="nav-item" data-view="enforcer-approvals">Enforcer Approvals <span class="badge-count" id="countEnforcerPending" style="display:none"></span></button>
+      <button class="nav-item" data-view="owner-approvals">Owner Approvals <span class="badge-count" id="countOwnerPending" style="display:none"></span></button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Monitoring</div>
+      <button class="nav-item" data-view="enforcer-monitor">Enforcers</button>
+      <button class="nav-item" data-view="owner-monitor">Vehicle Owners</button>
+      <button class="nav-item" data-view="violations">Violation Reports</button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Appeals &amp; Comms</div>
+      <button class="nav-item" data-view="appeals">Appeals Queue <span class="badge-count" id="countAppealsPending" style="display:none"></span></button>
+      <button class="nav-item" data-view="announcements">Announcements</button>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="admin-chip">
+        <div class="admin-avatar" id="adminInitial">A</div>
+        <div>
+          <div class="name" id="adminName">Admin</div>
+          <div class="role">Administrator</div>
+        </div>
+      </div>
+      <div class="logout-link" id="logoutBtn">Sign out</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- ---------- OVERVIEW ---------- -->
+    <section class="view active" id="view-overview">
+      <div class="topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="desc">Network-wide statistics — visible only to Administrators.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" id="refreshOverview">Refresh</button>
+      </div>
+
+      <div class="stat-grid" id="statGrid">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Enforcer Report Activity</h2>
+        </div>
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Enforcer</th><th>Badge No.</th><th>Station</th><th>Status</th><th>Total Reports</th></tr>
+            </thead>
+            <tbody id="leaderboardBody"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ENFORCER APPROVALS ---------- -->
+    <section class="view" id="view-enforcer-approvals">
+      <div class="topbar">
+        <div>
+          <h1>Enforcer Approvals</h1>
+          <p class="desc">New enforcer registrations. Accounts stay locked until approved here.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Official Email</th><th>Badge No.</th><th>Station</th><th>Submitted</th><th></th></tr>
+            </thead>
+            <tbody id="enforcerApprovalsBody"><tr><td colspan="6" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- OWNER APPROVALS ---------- -->
+    <section class="view" id="view-owner-approvals">
+      <div class="topbar">
+        <div>
+          <h1>Vehicle Owner Approvals</h1>
+          <p class="desc">New vehicle owner registrations pending review.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Plate No.</th><th>Submitted</th><th></th></tr>
+            </thead>
+            <tbody id="ownerApprovalsBody"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ENFORCER MONITOR ---------- -->
+    <section class="view" id="view-enforcer-monitor">
+      <div class="topbar">
+        <div>
+          <h1>Enforcer Accounts</h1>
+          <p class="desc">All enforcer credentials on the network.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Official Email</th><th>Badge No.</th><th>Station</th><th>Status</th></tr>
+            </thead>
+            <tbody id="enforcerMonitorBody"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- OWNER MONITOR ---------- -->
+    <section class="view" id="view-owner-monitor">
+      <div class="topbar">
+        <div>
+          <h1>Vehicle Owner Accounts</h1>
+          <p class="desc">All vehicle owner credentials. Flag any account that needs a closer look.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Plate No.</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="ownerMonitorBody"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- VIOLATIONS ---------- -->
+    <section class="view" id="view-violations">
+      <div class="topbar">
+        <div>
+          <h1>Violation Reports</h1>
+          <p class="desc">Every report submitted by an enforcer, in real time.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Plate No.</th><th>Violation</th><th>Enforcer</th><th>Location</th><th>Date/Time</th><th>Status</th></tr>
+            </thead>
+            <tbody id="violationsBody"><tr><td colspan="6" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- APPEALS ---------- -->
+    <section class="view" id="view-appeals">
+      <div class="topbar">
+        <div>
+          <h1>Appeals Queue</h1>
+          <p class="desc">Appeals submitted by vehicle owners against a violation.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table>
+            <thead>
+              <tr><th>Owner</th><th>Plate No.</th><th>Violation</th><th>Reason</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="appealsBody"><tr><td colspan="6" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ANNOUNCEMENTS ---------- -->
+    <section class="view" id="view-announcements">
+      <div class="topbar">
+        <div>
+          <h1>Announcements</h1>
+          <p class="desc">Broadcast a message — it appears in every enforcer's notifications.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>New announcement</h2></div>
+        <div class="panel-body pad">
+          <form id="announcementForm">
+            <div class="field">
+              <label for="annTitle">Title</label>
+              <input type="text" id="annTitle" placeholder="e.g. Updated checkpoint procedure" required />
+            </div>
+            <div class="field">
+              <label for="annMessage">Message</label>
+              <textarea id="annMessage" rows="4" style="width:100%; padding:11px 13px; border:1px solid var(--gray-300); border-radius:6px; font-family:var(--font-body); font-size:14px;" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-amber" id="annSubmitBtn">Send to all enforcers</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Sent announcements</h2></div>
+        <div class="panel-body">
+          <table>
+            <thead><tr><th>Title</th><th>Message</th><th>Sent</th></tr></thead>
+            <tbody id="announcementsBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ MODAL: reject reason / flag reason ============ -->
+<div class="modal-backdrop" id="reasonModal">
+  <div class="modal-box">
+    <h3 id="reasonModalTitle">Provide a reason</h3>
+    <p class="modal-sub" id="reasonModalSub"></p>
+    <textarea id="reasonModalInput" placeholder="Type a reason (optional)…"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="reasonModalCancel">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="reasonModalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: appeal under review feedback ============ -->
+<div class="modal-backdrop" id="appealModal">
+  <div class="modal-box">
+    <h3>Mark appeal as under review</h3>
+    <p class="modal-sub">This message will be sent to the owner's notifications and email.</p>
+    <textarea id="appealModalInput"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="appealModalCancel">Cancel</button>
+      <button class="btn btn-amber btn-sm" id="appealModalConfirm">Send &amp; mark under review</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: appeal resolution ============ -->
+<div class="modal-backdrop" id="resolveModal">
+  <div class="modal-box">
+    <h3 id="resolveModalTitle">Resolve appeal</h3>
+    <p class="modal-sub">This decision and message will be sent to the owner.</p>
+    <textarea id="resolveModalInput"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="resolveModalCancel">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="resolveModalConfirm">Confirm decision</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="js/admin-api.js"></script>
+<script src="js/admin-dashboard.js"></script>
+</body>
+</html>

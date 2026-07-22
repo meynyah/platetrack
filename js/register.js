@@ -29,10 +29,6 @@ const rules = {
     special: document.getElementById("ruleSpecial")
 };
 
-// =========================================
-// NEXT STEP
-// =========================================
-
 function nextStep(){
 
     const firstName = document.getElementById("firstName").value.trim();
@@ -40,12 +36,7 @@ function nextStep(){
     const badgeNumber = document.getElementById("badgeNumber").value.trim();
 
     if(firstName === "" || lastName === "" || badgeNumber === ""){
-
-        showError(
-            "Incomplete Information",
-            "Please complete all required personal information fields."
-        );
-
+        showError("Incomplete Information", "Please complete all required personal information fields.");
         return;
     }
 
@@ -56,10 +47,6 @@ function nextStep(){
     stepText.textContent = "Step 2 of 2";
 }
 
-// =========================================
-// PREVIOUS STEP
-// =========================================
-
 function previousStep(){
 
     step2.style.display = "none";
@@ -68,10 +55,6 @@ function previousStep(){
     progressFill.style.width = "50%";
     stepText.textContent = "Step 1 of 2";
 }
-
-// =========================================
-// SHOW / HIDE PASSWORD
-// =========================================
 
 function toggle(input, button){
 
@@ -93,10 +76,6 @@ togglePassword.addEventListener("click", () => {
 toggleConfirmPassword.addEventListener("click", () => {
     toggle(confirmPassword, toggleConfirmPassword);
 });
-
-// =========================================
-// PASSWORD RULES
-// =========================================
 
 function updateRule(rule, valid, hasTyped){
 
@@ -175,51 +154,32 @@ function checkPassword(){
     return score;
 }
 
-// =========================================
-// PASSWORD MATCH
-// =========================================
-
 function checkPasswordMatch(){
 
     const box = confirmPassword.parentElement;
 
     if(confirmPassword.value === ""){
-
         passwordMatch.textContent = "";
         passwordMatch.className = "password-match";
-
         box.classList.remove("success", "error");
-
         confirmIcon.className = "fa-solid fa-lock-open input-icon";
-
         return false;
     }
 
     if(password.value === confirmPassword.value){
-
-        passwordMatch.innerHTML =
-        '<i class="fa-solid fa-circle-check"></i> Passwords match';
-
+        passwordMatch.innerHTML = '<i class="fa-solid fa-circle-check"></i> Passwords match';
         passwordMatch.className = "password-match success";
-
         box.classList.remove("error");
         box.classList.add("success");
-
         confirmIcon.className = "fa-solid fa-circle-check input-icon";
-
         return true;
     }
 
-    passwordMatch.innerHTML =
-    '<i class="fa-solid fa-circle-xmark"></i> Passwords do not match';
-
+    passwordMatch.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Passwords do not match';
     passwordMatch.className = "password-match error";
-
     box.classList.remove("success");
     box.classList.add("error");
-
     confirmIcon.className = "fa-solid fa-circle-xmark input-icon";
-
     return false;
 }
 
@@ -230,11 +190,7 @@ password.addEventListener("input", () => {
 
 confirmPassword.addEventListener("input", checkPasswordMatch);
 
-// =========================================
-// CREATE ACCOUNT
-// =========================================
-
-registerBtn.addEventListener("click", function(){
+registerBtn.addEventListener("click", async function(){
 
     const email = document.getElementById("email").value.trim();
     const mobile = document.getElementById("mobile").value.trim();
@@ -244,75 +200,39 @@ registerBtn.addEventListener("click", function(){
     const isMatch = checkPasswordMatch();
 
     if(email === "" || password.value === "" || confirmPassword.value === ""){
-
-        showError(
-            "Incomplete Information",
-            "Please complete all required account information fields."
-        );
-
+        showError("Incomplete Information", "Please complete all required account information fields.");
         return;
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if(!emailPattern.test(email)){
-
-        showError(
-            "Invalid Email",
-            "Please enter a valid official email address."
-        );
-
+        showError("Invalid Email", "Please enter a valid official email address.");
         return;
     }
 
     if(mobile !== "" && !/^09\d{9}$/.test(mobile)){
-
-        showError(
-            "Invalid Mobile Number",
-            "Please enter a valid 11-digit Philippine mobile number."
-        );
-
+        showError("Invalid Mobile Number", "Please enter a valid 11-digit Philippine mobile number.");
         return;
     }
 
     if(score < 5){
-
-        showError(
-            "Weak Password",
-            "Please follow all password requirements before creating your account."
-        );
-
+        showError("Weak Password", "Please follow all password requirements before creating your account.");
         return;
     }
 
     if(!isMatch){
-
-        showError(
-            "Password Mismatch",
-            "Your passwords do not match. Please check your confirmation password."
-        );
-
+        showError("Password Mismatch", "Your passwords do not match. Please check your confirmation password.");
         return;
     }
 
     if(!agreement.checked){
-
-        showError(
-            "Agreement Required",
-            "Please certify that you are an authorized Traffic Enforcer."
-        );
-
+        showError("Agreement Required", "Please certify that you are an authorized Traffic Enforcer.");
         return;
     }
 
-    const normalizedEmail = email.toLowerCase();
-    const enforcers = JSON.parse(localStorage.getItem("plateTrackEnforcers")) || [];
-    if(enforcers.some(function(enforcer){
-        return enforcer.email && enforcer.email.toLowerCase() === normalizedEmail;
-    })){
-        showError("Account Already Exists", "An enforcer account with this email address already exists.");
-        return;
-    }
+    const fullName = document.getElementById("firstName").value.trim() + " " + document.getElementById("lastName").value.trim();
+    const badgeNumber = document.getElementById("badgeNumber").value.trim();
 
     registerBtn.disabled = true;
     registerBtn.classList.add("loading");
@@ -322,7 +242,29 @@ registerBtn.addEventListener("click", function(){
         Creating Secure Account...
     `;
 
-    setTimeout(() => {
+    try {
+
+        const response = await fetch(`${API_BASE_URL}/api/auth/enforcer/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                fullName,
+                email,
+                badgeNumber,
+                mobile,
+                password: password.value
+            })
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+            registerBtn.disabled = false;
+            registerBtn.classList.remove("loading");
+            registerBtn.innerHTML = "Create Account";
+            showError("Registration Failed", data.message || "Unable to complete registration. Please try again.");
+            return;
+        }
 
         registerBtn.classList.remove("loading");
         registerBtn.classList.add("success");
@@ -333,19 +275,6 @@ registerBtn.addEventListener("click", function(){
         `;
 
         setTimeout(() => {
-
-            enforcers.push({
-                fullName: document.getElementById("firstName").value.trim() + " " + document.getElementById("lastName").value.trim(),
-                badgeNumber: document.getElementById("badgeNumber").value.trim(),
-                email: normalizedEmail,
-                mobile: mobile,
-                assignedArea: "Antipolo City",
-                station: "Antipolo Traffic Management Office",
-                password: password.value,
-                status: "pending",
-                dateRegistered: new Date().toISOString()
-            });
-            localStorage.setItem("plateTrackEnforcers", JSON.stringify(enforcers));
 
             showSuccess(
                 "Registration Submitted",
@@ -362,5 +291,11 @@ registerBtn.addEventListener("click", function(){
 
         }, 900);
 
-    }, 1800);
+    } catch (error) {
+        registerBtn.disabled = false;
+        registerBtn.classList.remove("loading");
+        registerBtn.innerHTML = "Create Account";
+        showError("Connection Error", "Unable to reach the server. Please try again.");
+    }
+
 });

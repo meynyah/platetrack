@@ -2,17 +2,20 @@
 // PlateTrack | Owner Violations
 // ==========================================
 
-let currentOwner = null;
+const API_BASE = "http://localhost:5000/api";
 
-document.addEventListener("DOMContentLoaded", function(){
+let allViolations = [];
+let allAppeals = [];
 
-    currentOwner = requireOwnerSession();
+document.addEventListener("DOMContentLoaded", async function(){
 
-    if(!currentOwner){
+    const session = requireOwnerSession();
+
+    if(!session){
         return;
     }
 
-    loadViolations();
+    await loadViolations(session.token);
 
 });
 
@@ -20,95 +23,185 @@ document.addEventListener("DOMContentLoaded", function(){
 // SESSION HELPERS
 // ==========================================
 
-function getOwners(){
-
-    return JSON.parse(localStorage.getItem("plateTrackOwners")) || [];
-
-}
-
 function requireOwnerSession(){
 
-    const sessionEmail = localStorage.getItem("plateTrackOwnerSession");
+    const token = localStorage.getItem("plateTrackOwnerToken");
+    const storedUser = localStorage.getItem("plateTrackOwnerUser");
 
-    if(!sessionEmail){
+    if(!token || !storedUser){
 
         window.location.href = "owner-login.html";
         return null;
 
     }
 
-    const owners = getOwners();
+    try{
 
-    const owner = owners.find(function(item){
-        return item.email === sessionEmail;
-    });
+        const user = JSON.parse(storedUser);
 
-    if(!owner){
+        if(!user || user.role !== "owner"){
+            throw new Error("Invalid owner session.");
+        }
 
-        localStorage.removeItem("plateTrackOwnerSession");
+        return { token, user };
+
+    }catch(error){
+
+        clearOwnerSession();
         window.location.href = "owner-login.html";
         return null;
 
     }
 
-    return owner;
+}
+
+function clearOwnerSession(){
+    localStorage.removeItem("plateTrackOwnerToken");
+    localStorage.removeItem("plateTrackOwnerUser");
+    localStorage.removeItem("plateTrackOwnerSession");
+}
+
+// ==========================================
+// API
+// ==========================================
+
+async function ownerApiRequest(endpoint, token, options = {}){
+
+    const response = await fetch(
+        API_BASE + endpoint,
+        {
+            ...options,
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":`Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        }
+    );
+
+    let data = {};
+
+    try{
+        data = await response.json();
+    }catch(error){
+        data = {};
+    }
+
+    if(response.status === 401 || response.status === 403){
+
+        clearOwnerSession();
+        window.location.href = "owner-login.html";
+
+        throw new Error(data.message || "Your session has expired. Please sign in again.");
+
+    }
+
+    if(!response.ok){
+        throw new Error(data.message || "Unable to load your data.");
+    }
+
+    return data;
 
 }
 
 // ==========================================
-// DATA HELPERS
+// APPEAL LOOKUP HELPERS
 // ==========================================
 
-function normalizePlate(plate){
+function appealViolationId(appeal){
 
-    return (plate || "").toUpperCase().replace(/\s+/g, "");
+    if(!appeal || !appeal.violation){
+        return null;
+    }
 
-}
-
-function getOwnerViolations(){
-
-    const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
-
-    const ownerPlates = (currentOwner.vehicles || []).map(function(vehicle){
-        return normalizePlate(vehicle.plateNumber);
-    });
-
-    return history
-        .map(function(record, index){
-            return Object.assign({ historyIndex: index }, record);
-        })
-        .filter(function(record){
-            return ownerPlates.includes(normalizePlate(record.plateNumber));
-        });
+    return typeof appeal.violation === "object"
+        ? appeal.violation._id
+        : appeal.violation;
 
 }
 
-function getAppeals(){
+function findAppealForViolation(violationId){
 
-    return JSON.parse(localStorage.getItem("plateTrackAppeals")) || [];
-
-}
-
-function findAppealForRecord(recordId){
-
-    const appeals = getAppeals();
-
-    return appeals.find(function(appeal){
-        return appeal.recordId === recordId;
+    return allAppeals.find(function(appeal){
+        return appealViolationId(appeal) === violationId;
     }) || null;
 
 }
 
+function appealStatusLabel(status){
+
+    const labels = {
+        submitted:"Pending",
+        under_review:"Under Review",
+        approved:"Approved",
+        denied:"Denied"
+    };
+
+    return labels[status] || status;
+
+}
+
+function appealStatusClass(status){
+
+    if(status === "approved"){
+        return "approved";
+    }
+
+    if(status === "denied"){
+        return "denied";
+    }
+
+    return "pending"; // submitted / under_review
+
+}
+
 // ==========================================
-// LOAD VIOLATIONS
+// LOAD VIOLATIONS (from backend)
 // ==========================================
 
-function loadViolations(data = null){
-
-    const violations = data || getOwnerViolations();
+async function loadViolations(token, data = null){
 
     const historyList = document.getElementById("historyList");
     const emptyState = document.getElementById("emptyState");
+
+    if(data === null){
+
+        try{
+
+            const [violations, appeals] = await Promise.all([
+                ownerApiRequest("/owner/violations/mine", token),
+                ownerApiRequest("/owner/appeals/mine", token)
+            ]);
+
+            allViolations = Array.isArray(violations) ? violations : [];
+            allAppeals = Array.isArray(appeals) ? appeals : [];
+
+        }
+        catch(error){
+
+            console.error("Unable to load violations:", error);
+
+            historyList.innerHTML = "";
+            emptyState.style.display = "flex";
+
+            const heading = emptyState.querySelector("h3");
+            const paragraph = emptyState.querySelector("p");
+
+            if(heading){
+                heading.textContent = "Unable to Load Violations";
+            }
+
+            if(paragraph){
+                paragraph.textContent = error.message || "Please refresh the page.";
+            }
+
+            return;
+
+        }
+
+    }
+
+    const violations = data !== null ? data : allViolations;
 
     historyList.innerHTML = "";
 
@@ -124,22 +217,30 @@ function loadViolations(data = null){
 
     violations.forEach(function(item){
 
-        const appeal = findAppealForRecord(item.recordId);
+        const appeal = findAppealForViolation(item._id);
 
         let appealSection = "";
 
         if(appeal){
 
-            const statusClass = appeal.status.toLowerCase();
-
             appealSection = `
                 <div class="detail-row">
                     <span class="detail-label">Appeal Status</span>
-                    <span class="appeal-badge ${statusClass}">${appeal.status}</span>
+                    <span class="appeal-badge ${appealStatusClass(appeal.status)}">${escapeHtml(appealStatusLabel(appeal.status))}</span>
                 </div>
             `;
 
         }
+
+        const date = item.dateTime
+            ? new Date(item.dateTime).toLocaleString("en-PH",{
+                month:"short",
+                day:"numeric",
+                year:"numeric",
+                hour:"numeric",
+                minute:"2-digit"
+            })
+            : "-";
 
         historyList.innerHTML += `
             <div class="history-card">
@@ -148,16 +249,16 @@ function loadViolations(data = null){
 
                     <div>
                         <div class="record-id">
-                            ${item.recordId || "N/A"}
+                            ${escapeHtml((item._id || "").slice(-8).toUpperCase() || "N/A")}
                         </div>
 
                         <div class="plate-number">
-                            ${item.plateNumber || "Unknown Plate"}
+                            ${escapeHtml(item.plateNumber || "Unknown Plate")}
                         </div>
                     </div>
 
                     <div class="violation-badge">
-                        ${item.violation || "Violation"}
+                        ${escapeHtml(item.violationType || "Violation")}
                     </div>
 
                 </div>
@@ -165,18 +266,13 @@ function loadViolations(data = null){
                 <div class="history-details">
 
                     <div class="detail-row">
-                        <span class="detail-label">Vehicle</span>
-                        <span class="detail-value">${item.vehicleType || "-"}</span>
-                    </div>
-
-                    <div class="detail-row">
                         <span class="detail-label">Location</span>
-                        <span class="detail-value">${item.location || "-"}</span>
+                        <span class="detail-value">${escapeHtml(item.location || "-")}</span>
                     </div>
 
                     <div class="detail-row">
                         <span class="detail-label">Date</span>
-                        <span class="detail-value">${item.date || "-"}</span>
+                        <span class="detail-value">${escapeHtml(date)}</span>
                     </div>
 
                     ${appealSection}
@@ -188,7 +284,7 @@ function loadViolations(data = null){
                     <button
                     class="view-btn"
                     type="button"
-                    onclick="viewRecord('${item.recordId}')">
+                    onclick="viewRecord('${item._id}')">
 
                         <i class="fa-solid fa-eye"></i>
                         View
@@ -201,7 +297,7 @@ function loadViolations(data = null){
                     <button
                     class="appeal-btn"
                     type="button"
-                    onclick="startAppeal('${item.recordId}')">
+                    onclick="startAppeal('${item._id}')">
 
                         <i class="fa-solid fa-file-pen"></i>
                         File an Appeal
@@ -225,31 +321,36 @@ function applyFilters(){
     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
     const filter = document.getElementById("appealFilter").value;
 
-    const violations = getOwnerViolations().filter(function(item){
+    const filtered = allViolations.filter(function(item){
 
         const plate = (item.plateNumber || "").toLowerCase();
-        const recordId = (item.recordId || "").toLowerCase();
 
-        const matchKeyword =
-            plate.includes(keyword) ||
-            recordId.includes(keyword);
+        const matchKeyword = plate.includes(keyword);
 
-        const appeal = findAppealForRecord(item.recordId);
+        const appeal = findAppealForViolation(item._id);
 
         let matchFilter = true;
 
         if(filter === "none"){
             matchFilter = !appeal;
         }
-        else if(filter !== ""){
-            matchFilter = appeal && appeal.status === filter;
+        else if(filter === "Pending"){
+            matchFilter = !!appeal && (appeal.status === "submitted" || appeal.status === "under_review");
+        }
+        else if(filter === "Approved"){
+            matchFilter = !!appeal && appeal.status === "approved";
+        }
+        else if(filter === "Denied"){
+            matchFilter = !!appeal && appeal.status === "denied";
         }
 
         return matchKeyword && matchFilter;
 
     });
 
-    loadViolations(violations);
+    const token = localStorage.getItem("plateTrackOwnerToken");
+
+    loadViolations(token, filtered);
 
 }
 
@@ -257,9 +358,9 @@ function applyFilters(){
 // FILE APPEAL
 // ==========================================
 
-function startAppeal(recordId){
+function startAppeal(violationId){
 
-    localStorage.setItem("plateTrackCurrentAppealRecord", recordId);
+    localStorage.setItem("plateTrackCurrentAppealViolationId", violationId);
 
     window.location.href = "appeal-form.html";
 
@@ -269,12 +370,10 @@ function startAppeal(recordId){
 // VIEW RECORD
 // ==========================================
 
-function viewRecord(recordId){
+function viewRecord(violationId){
 
-    const violations = getOwnerViolations();
-
-    const item = violations.find(function(record){
-        return record.recordId === recordId;
+    const item = allViolations.find(function(record){
+        return record._id === violationId;
     });
 
     if(!item){
@@ -283,11 +382,11 @@ function viewRecord(recordId){
 
     const imageBox = document.getElementById("capturedDetailImage");
 
-    if(item.capturedImage){
+    if(item.photoUrl){
 
         imageBox.innerHTML = `
             <img
-            src="${item.capturedImage}"
+            src="${item.photoUrl}"
             alt="Captured vehicle evidence">
         `;
 
@@ -303,20 +402,30 @@ function viewRecord(recordId){
 
     }
 
-    document.getElementById("detailRecordId").textContent = item.recordId || "N/A";
+    const date = item.dateTime
+        ? new Date(item.dateTime).toLocaleString("en-PH",{
+            month:"long",
+            day:"numeric",
+            year:"numeric",
+            hour:"numeric",
+            minute:"2-digit"
+        })
+        : "-";
+
+    document.getElementById("detailRecordId").textContent = (item._id || "").slice(-8).toUpperCase() || "N/A";
     document.getElementById("detailPlate").textContent = item.plateNumber || "-";
-    document.getElementById("detailVehicle").textContent = item.vehicleType || "-";
-    document.getElementById("detailColor").textContent = item.vehicleColor || "-";
-    document.getElementById("detailViolation").textContent = item.violation || "-";
+    document.getElementById("detailVehicle").textContent = "-";
+    document.getElementById("detailColor").textContent = "-";
+    document.getElementById("detailViolation").textContent = item.violationType || "-";
     document.getElementById("detailLocation").textContent = item.location || "-";
-    document.getElementById("detailDate").textContent = item.date || "-";
+    document.getElementById("detailDate").textContent = date;
 
     document.getElementById("detailNotes").textContent =
     item.notes && item.notes.trim() !== ""
     ? item.notes
     : "No additional remarks.";
 
-    const appeal = findAppealForRecord(item.recordId);
+    const appeal = findAppealForViolation(item._id);
     const appealSection = document.getElementById("detailAppealSection");
 
     if(appeal){
@@ -324,12 +433,18 @@ function viewRecord(recordId){
         appealSection.innerHTML = `
             <div class="detail-item">
                 <span>Appeal Reason</span>
-                <strong>${appeal.reason}</strong>
+                <strong>${escapeHtml(appeal.reason)}</strong>
             </div>
             <div class="detail-item">
                 <span>Appeal Status</span>
-                <strong>${appeal.status}</strong>
+                <strong>${escapeHtml(appealStatusLabel(appeal.status))}</strong>
             </div>
+            ${appeal.adminFeedback ? `
+                <div class="detail-item">
+                    <span>Admin Feedback</span>
+                    <strong>${escapeHtml(appeal.adminFeedback)}</strong>
+                </div>
+            ` : ""}
         `;
 
     }
@@ -360,3 +475,16 @@ window.addEventListener("click", function(event){
     }
 
 });
+
+// ==========================================
+// SAFE HTML
+// ==========================================
+
+function escapeHtml(value){
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}

@@ -1,0 +1,491 @@
+// =========================================
+// PlateTrack | Enforcer Registration
+// Backend-integrated version
+// =========================================
+
+const API_URL = "http://localhost:5000/api/auth/enforcer/register";
+
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+const progressFill = document.getElementById("progressFill");
+const stepText = document.getElementById("stepText");
+
+const password = document.getElementById("password");
+const confirmPassword = document.getElementById("confirmPassword");
+
+const togglePassword = document.getElementById("togglePassword");
+const toggleConfirmPassword = document.getElementById(
+    "toggleConfirmPassword"
+);
+
+const registerBtn = document.getElementById("registerBtn");
+
+const strengthFill = document.getElementById("strengthFill");
+const strengthText = document.getElementById("strengthText");
+
+const confirmIcon = document.getElementById("confirmIcon");
+const passwordMatch = document.getElementById("passwordMatch");
+
+const rules = {
+    length: document.getElementById("ruleLength"),
+    upper: document.getElementById("ruleUpper"),
+    lower: document.getElementById("ruleLower"),
+    number: document.getElementById("ruleNumber"),
+    special: document.getElementById("ruleSpecial")
+};
+
+// =========================================
+// STEP NAVIGATION
+// =========================================
+
+function nextStep() {
+
+    const firstName = document
+        .getElementById("firstName")
+        .value
+        .trim();
+
+    const lastName = document
+        .getElementById("lastName")
+        .value
+        .trim();
+
+    const badgeNumber = document
+        .getElementById("badgeNumber")
+        .value
+        .trim();
+
+    if (!firstName || !lastName || !badgeNumber) {
+
+        showError(
+            "Incomplete Information",
+            "Please complete all required personal information fields."
+        );
+
+        return;
+    }
+
+    step1.style.display = "none";
+    step2.style.display = "block";
+
+    progressFill.style.width = "100%";
+    stepText.textContent = "Step 2 of 2";
+}
+
+function previousStep() {
+
+    step2.style.display = "none";
+    step1.style.display = "block";
+
+    progressFill.style.width = "50%";
+    stepText.textContent = "Step 1 of 2";
+}
+
+// Make inline HTML onclick functions available
+window.nextStep = nextStep;
+window.previousStep = previousStep;
+
+// =========================================
+// SHOW / HIDE PASSWORD
+// =========================================
+
+function togglePasswordVisibility(input, button) {
+
+    const icon = button.querySelector("i");
+
+    const isHidden = input.type === "password";
+
+    input.type = isHidden ? "text" : "password";
+
+    icon.className = isHidden
+        ? "fa-solid fa-eye-slash"
+        : "fa-solid fa-eye";
+}
+
+togglePassword.addEventListener("click", () => {
+    togglePasswordVisibility(password, togglePassword);
+});
+
+toggleConfirmPassword.addEventListener("click", () => {
+    togglePasswordVisibility(
+        confirmPassword,
+        toggleConfirmPassword
+    );
+});
+
+// =========================================
+// PASSWORD RULES
+// =========================================
+
+function updateRule(rule, valid, hasTyped) {
+
+    const icon = rule.querySelector("i");
+
+    rule.classList.remove("valid", "invalid");
+
+    if (!hasTyped) {
+        icon.className = "fa-regular fa-circle";
+        return;
+    }
+
+    if (valid) {
+        rule.classList.add("valid");
+        icon.className = "fa-solid fa-circle-check";
+    } else {
+        rule.classList.add("invalid");
+        icon.className = "fa-solid fa-circle-xmark";
+    }
+}
+
+function checkPassword() {
+
+    const value = password.value;
+
+    const hasTyped = value.length > 0;
+    const hasLength = value.length >= 8;
+    const hasUpper = /[A-Z]/.test(value);
+    const hasLower = /[a-z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+    updateRule(rules.length, hasLength, hasTyped);
+    updateRule(rules.upper, hasUpper, hasTyped);
+    updateRule(rules.lower, hasLower, hasTyped);
+    updateRule(rules.number, hasNumber, hasTyped);
+    updateRule(rules.special, hasSpecial, hasTyped);
+
+    let score = 0;
+
+    if (hasLength) score++;
+    if (hasUpper) score++;
+    if (hasLower) score++;
+    if (hasNumber) score++;
+    if (hasSpecial) score++;
+
+    if (!hasTyped) {
+
+        strengthFill.style.width = "0%";
+        strengthFill.style.background = "#223656";
+
+        strengthText.textContent = "—";
+        strengthText.style.color = "";
+
+        return score;
+    }
+
+    if (score <= 1) {
+
+        strengthFill.style.width = "20%";
+        strengthFill.style.background = "#ef4444";
+
+        strengthText.textContent = "Weak";
+        strengthText.style.color = "#f87171";
+
+    } else if (score === 2) {
+
+        strengthFill.style.width = "45%";
+        strengthFill.style.background = "#f97316";
+
+        strengthText.textContent = "Fair";
+        strengthText.style.color = "#fb923c";
+
+    } else if (score <= 4) {
+
+        strengthFill.style.width = "75%";
+        strengthFill.style.background = "#facc15";
+
+        strengthText.textContent = "Good";
+        strengthText.style.color = "#fde047";
+
+    } else {
+
+        strengthFill.style.width = "100%";
+        strengthFill.style.background = "#22c55e";
+
+        strengthText.textContent = "Strong";
+        strengthText.style.color = "#4ade80";
+    }
+
+    return score;
+}
+
+// =========================================
+// PASSWORD MATCH
+// =========================================
+
+function checkPasswordMatch() {
+
+    const box = confirmPassword.parentElement;
+
+    if (!confirmPassword.value) {
+
+        passwordMatch.textContent = "";
+        passwordMatch.className = "password-match";
+
+        box.classList.remove("success", "error");
+
+        confirmIcon.className =
+            "fa-solid fa-lock-open input-icon";
+
+        return false;
+    }
+
+    if (password.value === confirmPassword.value) {
+
+        passwordMatch.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            Passwords match
+        `;
+
+        passwordMatch.className =
+            "password-match success";
+
+        box.classList.remove("error");
+        box.classList.add("success");
+
+        confirmIcon.className =
+            "fa-solid fa-circle-check input-icon";
+
+        return true;
+    }
+
+    passwordMatch.innerHTML = `
+        <i class="fa-solid fa-circle-xmark"></i>
+        Passwords do not match
+    `;
+
+    passwordMatch.className =
+        "password-match error";
+
+    box.classList.remove("success");
+    box.classList.add("error");
+
+    confirmIcon.className =
+        "fa-solid fa-circle-xmark input-icon";
+
+    return false;
+}
+
+password.addEventListener("input", () => {
+    checkPassword();
+    checkPasswordMatch();
+});
+
+confirmPassword.addEventListener(
+    "input",
+    checkPasswordMatch
+);
+
+// =========================================
+// BUTTON HELPERS
+// =========================================
+
+function setLoadingState() {
+
+    registerBtn.disabled = true;
+
+    registerBtn.classList.remove("success");
+    registerBtn.classList.add("loading");
+
+    registerBtn.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Creating Secure Account...
+    `;
+}
+
+function resetRegisterButton() {
+
+    registerBtn.disabled = false;
+
+    registerBtn.classList.remove(
+        "loading",
+        "success"
+    );
+
+    registerBtn.innerHTML = "Create Account";
+}
+
+// =========================================
+// CREATE ACCOUNT
+// =========================================
+
+registerBtn.addEventListener("click", async () => {
+
+    const firstName = document
+        .getElementById("firstName")
+        .value
+        .trim();
+
+    const middleName = document
+        .getElementById("middleName")
+        .value
+        .trim();
+
+    const lastName = document
+        .getElementById("lastName")
+        .value
+        .trim();
+
+    const badgeNumber = document
+        .getElementById("badgeNumber")
+        .value
+        .trim()
+        .toUpperCase();
+
+    const email = document
+        .getElementById("email")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const mobile = document
+        .getElementById("mobile")
+        .value
+        .trim();
+
+    const agreement = document.getElementById("agreement");
+
+    const score = checkPassword();
+    const isMatch = checkPasswordMatch();
+
+    if (
+        !firstName ||
+        !lastName ||
+        !badgeNumber ||
+        !email ||
+        !password.value ||
+        !confirmPassword.value
+    ) {
+
+        showError(
+            "Incomplete Information",
+            "Please complete all required registration fields."
+        );
+
+        return;
+    }
+
+    const officialEmailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!officialEmailPattern.test(email)) {
+
+        showError(
+            "Invalid Email",
+            "Please enter a valid email address."
+        );
+
+        return;
+    }
+
+    if (mobile && !/^09\d{9}$/.test(mobile)) {
+
+        showError(
+            "Invalid Mobile Number",
+            "Please enter a valid 11-digit Philippine mobile number."
+        );
+
+        return;
+    }
+
+    if (score < 5) {
+
+        showError(
+            "Weak Password",
+            "Please follow all password requirements before creating your account."
+        );
+
+        return;
+    }
+
+    if (!isMatch) {
+
+        showError(
+            "Password Mismatch",
+            "Your passwords do not match."
+        );
+
+        return;
+    }
+
+    if (!agreement.checked) {
+
+        showError(
+            "Agreement Required",
+            "Please certify that you are an authorized Traffic Enforcer."
+        );
+
+        return;
+    }
+
+    const fullName = [
+        firstName,
+        middleName,
+        lastName
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+    setLoadingState();
+
+    try {
+
+        const response = await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                fullName,
+                email,
+                badgeNumber,
+                station:
+                    "Antipolo Traffic Management Office",
+                password: password.value
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message ||
+                "Registration could not be completed."
+            );
+        }
+
+        registerBtn.classList.remove("loading");
+        registerBtn.classList.add("success");
+
+        registerBtn.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            Registration Submitted
+        `;
+
+        showSuccess(
+            "Registration Submitted",
+            data.message ||
+            "Your account is now pending administrator approval.",
+            () => {
+                window.location.href =
+                    "enforcer-login.html";
+            },
+            "Back to Login"
+        );
+
+    } catch (error) {
+
+        console.error("Registration error:", error);
+
+        showError(
+            "Registration Failed",
+            error.message ||
+            "Unable to connect to the PlateTrack server."
+        );
+
+        resetRegisterButton();
+    }
+});

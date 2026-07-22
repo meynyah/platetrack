@@ -1,93 +1,131 @@
 // ==========================================
 // PlateTrack | Owner Dashboard
+// Backend + JWT Version
 // ==========================================
 
-document.addEventListener("DOMContentLoaded", function(){
+const API_BASE = "http://localhost:5000/api";
 
-    const owner = requireOwnerSession();
+document.addEventListener("DOMContentLoaded", async function(){
 
-    if(!owner){
+    const session = requireOwnerSession();
+
+    if(!session){
         return;
     }
 
     updateDateTime();
     updateGreeting();
-    loadOwnerInfo(owner);
-    loadPlates(owner);
-    loadStats(owner);
-    loadRecentViolations(owner);
+    loadOwnerInfo(session.user);
+    loadRegisteredPlate(session.user);
 
     setInterval(updateDateTime, 1000);
+
+    await loadOwnerDashboardData(session.token);
 
 });
 
 // ==========================================
-// SESSION HELPERS
+// SESSION
 // ==========================================
-
-function getOwners(){
-
-    return JSON.parse(localStorage.getItem("plateTrackOwners")) || [];
-
-}
 
 function requireOwnerSession(){
 
-    const sessionEmail = localStorage.getItem("plateTrackOwnerSession");
+    const token =
+        localStorage.getItem("plateTrackOwnerToken");
 
-    if(!sessionEmail){
+    const storedUser =
+        localStorage.getItem("plateTrackOwnerUser");
 
-        window.location.href = "owner-login.html";
+    if(!token || !storedUser){
+
+        clearOwnerSession();
+
+        window.location.replace("owner-login.html");
+
         return null;
-
     }
 
-    const owners = getOwners();
+    try{
 
-    const owner = owners.find(function(item){
-        return item.email === sessionEmail;
-    });
+        const user = JSON.parse(storedUser);
 
-    if(!owner){
+        if(!user || user.role !== "owner"){
 
-        localStorage.removeItem("plateTrackOwnerSession");
-        window.location.href = "owner-login.html";
+            throw new Error("Invalid owner session.");
+        }
+
+        return {
+            token,
+            user
+        };
+
+    }catch(error){
+
+        clearOwnerSession();
+
+        window.location.replace("owner-login.html");
+
         return null;
-
     }
 
-    return owner;
+}
+
+function clearOwnerSession(){
+
+    localStorage.removeItem("plateTrackOwnerToken");
+    localStorage.removeItem("plateTrackOwnerUser");
+    localStorage.removeItem("plateTrackOwnerSession");
 
 }
 
-function normalizePlate(plate){
+// ==========================================
+// API
+// ==========================================
 
-    return (plate || "").toUpperCase().replace(/\s+/g, "");
+async function ownerApiRequest(endpoint, token, options = {}){
 
-}
+    const response = await fetch(
+        API_BASE + endpoint,
+        {
+            ...options,
 
-function getOwnerViolations(owner){
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":`Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        }
+    );
 
-    const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
+    let data = {};
 
-    const ownerPlates = (owner.vehicles || []).map(function(vehicle){
-        return normalizePlate(vehicle.plateNumber);
-    });
+    try{
+        data = await response.json();
+    }catch(error){
+        data = {};
+    }
 
-    return history.filter(function(record){
-        return ownerPlates.includes(normalizePlate(record.plateNumber));
-    });
+    if(response.status === 401 || response.status === 403){
 
-}
+        clearOwnerSession();
 
-function getOwnerAppeals(owner){
+        window.location.replace("owner-login.html");
 
-    const appeals = JSON.parse(localStorage.getItem("plateTrackAppeals")) || [];
+        throw new Error(
+            data.message ||
+            "Your session has expired. Please sign in again."
+        );
+    }
 
-    return appeals.filter(function(appeal){
-        return appeal.ownerEmail === owner.email;
-    });
+    if(!response.ok){
 
+        throw new Error(
+            data.message ||
+            "Unable to load owner data."
+        );
+    }
+
+    return data;
 }
 
 // ==========================================
@@ -98,208 +136,453 @@ function updateDateTime(){
 
     const now = new Date();
 
-    document.getElementById("todayDate").textContent =
-    now.toLocaleDateString("en-US",{
-        year:"numeric",
-        month:"long",
-        day:"numeric"
-    });
+    const todayDate =
+        document.getElementById("todayDate");
 
-    document.getElementById("liveTime").textContent =
-    now.toLocaleTimeString("en-US",{
-        hour:"numeric",
-        minute:"2-digit",
-        second:"2-digit",
-        hour12:true
-    });
+    const liveTime =
+        document.getElementById("liveTime");
 
+    if(todayDate){
+
+        todayDate.textContent =
+            now.toLocaleDateString(
+                "en-PH",
+                {
+                    year:"numeric",
+                    month:"long",
+                    day:"numeric"
+                }
+            );
+    }
+
+    if(liveTime){
+
+        liveTime.textContent =
+            now.toLocaleTimeString(
+                "en-PH",
+                {
+                    hour:"numeric",
+                    minute:"2-digit",
+                    second:"2-digit",
+                    hour12:true
+                }
+            );
+    }
 }
 
 function updateGreeting(){
 
+    const greeting =
+        document.getElementById("greeting");
+
+    if(!greeting){
+        return;
+    }
+
     const hour = new Date().getHours();
-    const greeting = document.getElementById("greeting");
 
     if(hour < 12){
-        greeting.innerHTML = "Good Morning ☀️";
-    }
-    else if(hour < 18){
-        greeting.innerHTML = "Good Afternoon 🌤";
-    }
-    else{
-        greeting.innerHTML = "Good Evening 🌙";
-    }
 
+        greeting.textContent =
+            "Good Morning ☀️";
+
+    }else if(hour < 18){
+
+        greeting.textContent =
+            "Good Afternoon 🌤";
+
+    }else{
+
+        greeting.textContent =
+            "Good Evening 🌙";
+    }
 }
 
 // ==========================================
-// LOAD OWNER INFO
+// OWNER INFORMATION
 // ==========================================
 
 function loadOwnerInfo(owner){
 
-    document.getElementById("ownerName").textContent = owner.fullName;
-    document.getElementById("ownerEmail").textContent = owner.email;
+    const ownerName =
+        document.getElementById("ownerName");
 
-    const img = document.getElementById("dashboardAvatarImage");
-    const icon = document.getElementById("dashboardAvatarIcon");
+    const ownerEmail =
+        document.getElementById("ownerEmail");
 
-    if(owner.profilePicture){
+    if(ownerName){
 
-        img.src = owner.profilePicture;
-        img.style.display = "block";
-        icon.style.display = "none";
-
+        ownerName.textContent =
+            owner.fullName ||
+            "Vehicle Owner";
     }
-    else{
 
-        img.style.display = "none";
+    if(ownerEmail){
+
+        ownerEmail.textContent =
+            owner.email ||
+            "No email available";
+    }
+
+    const image =
+        document.getElementById("dashboardAvatarImage");
+
+    const icon =
+        document.getElementById("dashboardAvatarIcon");
+
+    if(image){
+        image.style.display = "none";
+    }
+
+    if(icon){
         icon.style.display = "block";
-
     }
-
 }
 
-function loadPlates(owner){
+function loadRegisteredPlate(owner){
 
-    const plateList = document.getElementById("plateList");
+    const plateList =
+        document.getElementById("plateList");
 
-    plateList.innerHTML = "";
+    const plateCount =
+        document.getElementById("plateCount");
 
-    (owner.vehicles || []).forEach(function(vehicle){
+    const plateNumber =
+        String(owner.plateNumber || "")
+            .trim()
+            .toUpperCase();
 
-        plateList.innerHTML += `
-            <div class="plate-chip">
-                <i class="fa-solid fa-id-card"></i>
-                ${vehicle.plateNumber}
-                <span class="plate-chip-detail">${vehicle.vehicleType || "-"} • ${vehicle.vehicleColor || "-"}</span>
-            </div>
-        `;
+    if(plateCount){
 
-    });
+        plateCount.textContent =
+            plateNumber ? "1" : "0";
+    }
 
-    if((owner.vehicles || []).length === 0){
+    if(!plateList){
+        return;
+    }
+
+    if(!plateNumber){
 
         plateList.innerHTML = `
             <div class="plate-chip">
                 <i class="fa-solid fa-circle-info"></i>
-                No registered vehicles
-            </div>
-        `;
-
-    }
-
-}
-
-// ==========================================
-// LOAD STATS
-// ==========================================
-
-function loadStats(owner){
-
-    const violations = getOwnerViolations(owner);
-    const appeals = getOwnerAppeals(owner);
-
-    const pending = appeals.filter(function(appeal){
-        return appeal.status === "Pending";
-    });
-
-    document.getElementById("plateCount").textContent = (owner.vehicles || []).length;
-    document.getElementById("violationCount").textContent = violations.length;
-    document.getElementById("pendingAppeals").textContent = pending.length;
-
-}
-
-// ==========================================
-// LOAD RECENT VIOLATIONS
-// ==========================================
-
-function loadRecentViolations(owner){
-
-    const container = document.getElementById("recentViolations");
-    const violations = getOwnerViolations(owner);
-
-    container.innerHTML = "";
-
-    if(violations.length === 0){
-
-        container.innerHTML = `
-            <div class="empty-state" style="display:flex;">
-                <div class="empty-icon">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-                <h3>No Violations Found</h3>
-                <p>Your registered plates have no recorded violations.</p>
+                No registered plate
             </div>
         `;
 
         return;
     }
 
-    const recent = violations.slice(0,3);
+    plateList.innerHTML = `
+        <div class="plate-chip">
 
-    recent.forEach(function(item){
+            <i class="fa-solid fa-id-card"></i>
 
-        container.innerHTML += `
-            <div class="detection-card">
+            ${escapeHtml(plateNumber)}
 
-                <div class="plate-icon">
-                    <i class="fa-solid fa-car"></i>
+            <span class="plate-chip-detail">
+                Registered Vehicle
+            </span>
+
+        </div>
+    `;
+}
+
+// ==========================================
+// LOAD DASHBOARD DATA
+// ==========================================
+
+async function loadOwnerDashboardData(token){
+
+    try{
+
+        const [
+            violations,
+            appeals
+        ] = await Promise.all([
+
+            ownerApiRequest(
+                "/owner/violations/mine",
+                token
+            ),
+
+            ownerApiRequest(
+                "/owner/appeals/mine",
+                token
+            )
+
+        ]);
+
+        const safeViolations =
+            Array.isArray(violations)
+                ? violations
+                : [];
+
+        const safeAppeals =
+            Array.isArray(appeals)
+                ? appeals
+                : [];
+
+        loadStats(
+            safeViolations,
+            safeAppeals
+        );
+
+        loadRecentViolations(
+            safeViolations
+        );
+
+    }catch(error){
+
+        console.error(
+            "Owner dashboard loading error:",
+            error
+        );
+
+        const recentViolations =
+            document.getElementById(
+                "recentViolations"
+            );
+
+        if(recentViolations){
+
+            recentViolations.innerHTML = `
+                <div class="empty-state" style="display:flex;">
+
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <h3>
+                        Unable to Load Records
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(
+                            error.message ||
+                            "Please refresh the dashboard."
+                        )}
+                    </p>
+
+                </div>
+            `;
+        }
+    }
+}
+
+// ==========================================
+// STATS
+// ==========================================
+
+function loadStats(violations, appeals){
+
+    const violationCount =
+        document.getElementById(
+            "violationCount"
+        );
+
+    const pendingAppeals =
+        document.getElementById(
+            "pendingAppeals"
+        );
+
+    const pending =
+        appeals.filter(function(appeal){
+
+            return (
+                appeal.status === "submitted" ||
+                appeal.status === "under_review"
+            );
+        });
+
+    if(violationCount){
+
+        violationCount.textContent =
+            violations.length;
+    }
+
+    if(pendingAppeals){
+
+        pendingAppeals.textContent =
+            pending.length;
+    }
+}
+
+// ==========================================
+// RECENT VIOLATIONS
+// ==========================================
+
+function loadRecentViolations(violations){
+
+    const container =
+        document.getElementById(
+            "recentViolations"
+        );
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if(!violations.length){
+
+        container.innerHTML = `
+            <div class="empty-state" style="display:flex;">
+
+                <div class="empty-icon">
+                    <i class="fa-solid fa-circle-check"></i>
                 </div>
 
-                <div class="plate-details">
-                    <h3>${item.plateNumber || "Unknown Plate"}</h3>
-                    <p>${item.vehicleType || "Unknown Vehicle"}</p>
-                    <small>${item.violation || "Violation Recorded"}</small>
-                </div>
+                <h3>
+                    No Violations Found
+                </h3>
 
-                <span class="time-badge">
-                    ${item.date || "Recent"}
-                </span>
+                <p>
+                    Your registered plate has no recorded violations.
+                </p>
 
             </div>
         `;
 
-    });
+        return;
+    }
 
+    violations
+        .slice(0, 3)
+        .forEach(function(item){
+
+            const date =
+                item.dateTime
+                    ? new Date(
+                        item.dateTime
+                    ).toLocaleString(
+                        "en-PH",
+                        {
+                            month:"short",
+                            day:"numeric",
+                            year:"numeric",
+                            hour:"numeric",
+                            minute:"2-digit"
+                        }
+                    )
+                    : "Recent";
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+                    <div class="detection-card">
+
+                        <div class="plate-icon">
+
+                            <i class="fa-solid fa-car"></i>
+
+                        </div>
+
+                        <div class="plate-details">
+
+                            <h3>
+                                ${escapeHtml(
+                                    item.plateNumber ||
+                                    "Unknown Plate"
+                                )}
+                            </h3>
+
+                            <p>
+                                ${escapeHtml(
+                                    item.violationType ||
+                                    "Traffic Violation"
+                                )}
+                            </p>
+
+                            <small>
+                                ${escapeHtml(
+                                    item.location ||
+                                    "Antipolo City"
+                                )}
+                            </small>
+
+                        </div>
+
+                        <span class="time-badge">
+                            ${escapeHtml(date)}
+                        </span>
+
+                    </div>
+                `
+            );
+        });
 }
 
 // ==========================================
-// MENU / LOGOUT
+// MENU
 // ==========================================
 
 function toggleMenu(){
 
-    const menu = document.getElementById("headerMenu");
+    const menu =
+        document.getElementById("headerMenu");
+
+    if(!menu){
+        return;
+    }
 
     menu.style.display =
-    menu.style.display === "block" ? "none" : "block";
-
+        menu.style.display === "block"
+            ? "none"
+            : "block";
 }
 
-window.addEventListener("click", function(e){
+window.toggleMenu = toggleMenu;
 
-    if(!e.target.closest(".menu-wrapper")){
+window.addEventListener("click", function(event){
 
-        const menu = document.getElementById("headerMenu");
+    if(!event.target.closest(".menu-wrapper")){
+
+        const menu =
+            document.getElementById(
+                "headerMenu"
+            );
 
         if(menu){
             menu.style.display = "none";
         }
-
     }
-
 });
+
+// ==========================================
+// LOGOUT
+// ==========================================
 
 function confirmLogout(){
 
     showConfirm(
         "Logout",
-        "Are you sure you want to logout?",
+        "Are you sure you want to log out?",
         function(){
-            localStorage.removeItem("plateTrackOwnerSession");
-            window.location.href = "owner-login.html";
+
+            clearOwnerSession();
+
+            window.location.replace(
+                "owner-login.html"
+            );
         }
     );
+}
 
+window.confirmLogout = confirmLogout;
+
+// ==========================================
+// SAFE HTML
+// ==========================================
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }

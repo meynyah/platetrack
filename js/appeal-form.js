@@ -2,18 +2,22 @@
 // PlateTrack | Appeal Form
 // ==========================================
 
-let currentOwner = null;
+const API_BASE = "http://localhost:5000/api";
+
+let currentOwnerToken = null;
 let currentRecord = null;
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", async function(){
 
-    currentOwner = requireOwnerSession();
+    const session = requireOwnerSession();
 
-    if(!currentOwner){
+    if(!session){
         return;
     }
 
-    loadRecordForAppeal();
+    currentOwnerToken = session.token;
+
+    await loadRecordForAppeal(session.token);
     setupReasonDropdown();
 
 });
@@ -22,56 +26,96 @@ document.addEventListener("DOMContentLoaded", function(){
 // SESSION HELPERS
 // ==========================================
 
-function getOwners(){
-
-    return JSON.parse(localStorage.getItem("plateTrackOwners")) || [];
-
-}
-
 function requireOwnerSession(){
 
-    const sessionEmail = localStorage.getItem("plateTrackOwnerSession");
+    const token = localStorage.getItem("plateTrackOwnerToken");
+    const storedUser = localStorage.getItem("plateTrackOwnerUser");
 
-    if(!sessionEmail){
+    if(!token || !storedUser){
 
         window.location.href = "owner-login.html";
         return null;
 
     }
 
-    const owners = getOwners();
+    try{
 
-    const owner = owners.find(function(item){
-        return item.email === sessionEmail;
-    });
+        const user = JSON.parse(storedUser);
 
-    if(!owner){
+        if(!user || user.role !== "owner"){
+            throw new Error("Invalid owner session.");
+        }
 
-        localStorage.removeItem("plateTrackOwnerSession");
+        return { token, user };
+
+    }catch(error){
+
+        clearOwnerSession();
         window.location.href = "owner-login.html";
         return null;
 
     }
 
-    return owner;
+}
+
+function clearOwnerSession(){
+    localStorage.removeItem("plateTrackOwnerToken");
+    localStorage.removeItem("plateTrackOwnerUser");
+    localStorage.removeItem("plateTrackOwnerSession");
+}
+
+// ==========================================
+// API
+// ==========================================
+
+async function ownerApiRequest(endpoint, token, options = {}){
+
+    const response = await fetch(
+        API_BASE + endpoint,
+        {
+            ...options,
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":`Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        }
+    );
+
+    let data = {};
+
+    try{
+        data = await response.json();
+    }catch(error){
+        data = {};
+    }
+
+    if(response.status === 401 || response.status === 403){
+
+        clearOwnerSession();
+        window.location.href = "owner-login.html";
+
+        throw new Error(data.message || "Your session has expired. Please sign in again.");
+
+    }
+
+    if(!response.ok){
+        throw new Error(data.message || "Request failed.");
+    }
+
+    return data;
 
 }
 
 // ==========================================
-// LOAD VIOLATION RECORD
+// LOAD VIOLATION RECORD (from backend)
 // ==========================================
 
-function loadRecordForAppeal(){
+async function loadRecordForAppeal(token){
 
-    const recordId = localStorage.getItem("plateTrackCurrentAppealRecord");
+    const violationId = localStorage.getItem("plateTrackCurrentAppealViolationId");
 
-    const history = JSON.parse(localStorage.getItem("plateTrackHistory")) || [];
-
-    currentRecord = history.find(function(record){
-        return record.recordId === recordId;
-    });
-
-    if(!currentRecord){
+    if(!violationId){
 
         showError(
             "No Violation Selected",
@@ -85,17 +129,63 @@ function loadRecordForAppeal(){
         return;
     }
 
-    const appeals = JSON.parse(localStorage.getItem("plateTrackAppeals")) || [];
+    try{
 
-    const existingAppeal = appeals.find(function(appeal){
-        return appeal.recordId === recordId;
-    });
+        const [violations, appeals] = await Promise.all([
+            ownerApiRequest("/owner/violations/mine", token),
+            ownerApiRequest("/owner/appeals/mine", token)
+        ]);
 
-    if(existingAppeal){
+        currentRecord = (Array.isArray(violations) ? violations : []).find(function(item){
+            return item._id === violationId;
+        });
 
-        showInfo(
-            "Appeal Already Filed",
-            "You have already filed an appeal for this violation."
+        if(!currentRecord){
+
+            showError(
+                "Violation Not Found",
+                "That violation record could not be found on your account."
+            );
+
+            setTimeout(function(){
+                window.location.href = "owner-violations.html";
+            }, 1500);
+
+            return;
+        }
+
+        const existingAppeal = (Array.isArray(appeals) ? appeals : []).find(function(appeal){
+
+            const appealViolationId = appeal.violation && typeof appeal.violation === "object"
+                ? appeal.violation._id
+                : appeal.violation;
+
+            return appealViolationId === violationId;
+
+        });
+
+        if(existingAppeal){
+
+            showInfo(
+                "Appeal Already Filed",
+                "You have already filed an appeal for this violation."
+            );
+
+            setTimeout(function(){
+                window.location.href = "owner-violations.html";
+            }, 1500);
+
+            return;
+        }
+
+    }
+    catch(error){
+
+        console.error("Unable to load violation for appeal:", error);
+
+        showError(
+            "Unable to Load Violation",
+            error.message || "Please try again."
         );
 
         setTimeout(function(){
@@ -105,10 +195,20 @@ function loadRecordForAppeal(){
         return;
     }
 
+    const date = currentRecord.dateTime
+        ? new Date(currentRecord.dateTime).toLocaleString("en-PH",{
+            month:"long",
+            day:"numeric",
+            year:"numeric",
+            hour:"numeric",
+            minute:"2-digit"
+        })
+        : "";
+
     document.getElementById("plateNumber").value = currentRecord.plateNumber || "";
-    document.getElementById("recordId").value = currentRecord.recordId || "";
-    document.getElementById("violationType").value = currentRecord.violation || "";
-    document.getElementById("violationDate").value = currentRecord.date || "";
+    document.getElementById("recordId").value = (currentRecord._id || "").slice(-8).toUpperCase();
+    document.getElementById("violationType").value = currentRecord.violationType || "";
+    document.getElementById("violationDate").value = date;
     document.getElementById("violationLocation").value = currentRecord.location || "";
 
 }
@@ -139,10 +239,10 @@ function setupReasonDropdown(){
 }
 
 // ==========================================
-// SUBMIT APPEAL
+// SUBMIT APPEAL (to backend)
 // ==========================================
 
-function submitAppeal(){
+async function submitAppeal(){
 
     if(!currentRecord){
         return;
@@ -187,33 +287,49 @@ function submitAppeal(){
         return;
     }
 
-    const appeals = JSON.parse(localStorage.getItem("plateTrackAppeals")) || [];
+    const submitButton = document.getElementById("submitAppealBtn");
+    const originalHtml = submitButton ? submitButton.innerHTML : "";
 
-    const year = new Date().getFullYear();
+    if(submitButton){
+        submitButton.disabled = true;
+        submitButton.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Submitting...`;
+    }
 
-    const appealId = `AP-${year}-${String(appeals.length + 1).padStart(6,"0")}`;
+    try{
 
-    appeals.unshift({
-        appealId: appealId,
-        recordId: currentRecord.recordId,
-        plateNumber: currentRecord.plateNumber,
-        ownerEmail: currentOwner.email,
-        reason: reason,
-        explanation: explanation,
-        dateFiled: new Intl.DateTimeFormat("en-US",{
-            month:"long",
-            day:"numeric",
-            year:"numeric",
-            hour:"numeric",
-            minute:"2-digit",
-            hour12:true
-        }).format(new Date()),
-        status: "Pending"
-    });
+        await ownerApiRequest(
+            "/owner/appeals",
+            currentOwnerToken,
+            {
+                method:"POST",
+                body:JSON.stringify({
+                    violationId: currentRecord._id,
+                    reason: reason,
+                    supportingDetails: explanation
+                })
+            }
+        );
 
-    localStorage.setItem("plateTrackAppeals", JSON.stringify(appeals));
+    }
+    catch(error){
 
-    localStorage.removeItem("plateTrackCurrentAppealRecord");
+        console.error("Unable to submit appeal:", error);
+
+        if(submitButton){
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalHtml;
+        }
+
+        showError(
+            "Submission Failed",
+            error.message || "Unable to submit your appeal. Please try again."
+        );
+
+        return;
+
+    }
+
+    localStorage.removeItem("plateTrackCurrentAppealViolationId");
 
     showSuccess(
         "Appeal Submitted",
